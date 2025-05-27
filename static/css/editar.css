@@ -1,0 +1,91 @@
+body {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        background-color: #f5f7fa;
+        margin: 0;
+        padding: 0;
+    }
+    .fundo{
+        background: url('/static/Fundo\ typeform.jpg') no-repeat center center fixed;
+        background-size: cover;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+            
+    }
+
+    .container {
+        background-color: #fff;
+        max-width: 600px;
+        margin: 50px auto;
+        padding: 30px 40px;
+        border-radius: 10px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 30px;
+    }
+
+    form label {
+        display: block;
+        margin-bottom: 5px;
+        color: #333;
+        font-weight: 500;
+    }
+
+    form input[type="text"],
+    form select,
+    form textarea {
+        width: 100%;
+        padding: 10px 12px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 8px;
+        box-sizing: border-box;
+        font-size: 15px;
+        transition: border-color 0.3s;
+    }
+
+    form input[type="text"]:focus,
+    form select:focus,
+    form textarea:focus {
+        border-color: #007BFF;
+        outline: none;
+    }
+
+    form textarea {
+        resize: vertical;
+        min-height: 80px;
+        text-align: left;
+        padding: 10px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+    }
+
+
+    button {
+        background-color: #007BFF;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        font-size: 15px;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: #0056b3;
+    }
+
+    a {
+        color: #007BFF;
+        text-decoration: none;
+        margin-left: 15px;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }

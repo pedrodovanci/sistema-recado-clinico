@@ -1,0 +1,100 @@
+@media print {
+  .no-print {
+    display: none;
+  }
+}
+
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+}
+
+.recado {
+  width: 19cm;
+  height: 14cm;
+  margin: 1cm auto;
+  padding: 20px;
+  border: 1px solid #000;
+  page-break-after: always;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  text-transform: uppercase;
+
+}
+
+.linha-topo, .linha-meio, .linha-rodape {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
+
+.paciente {
+  font-size: 18px;
+  font-weight: bold;
+  text-align: left;
+  margin: 10px 0 2px 0;
+}
+
+.subinfo {
+  font-size: 14px;
+  text-align: left;
+  margin-bottom: 12px;
+}
+
+
+.descricao {
+  font-size: 16px;
+  border-top: 1px solid #000;
+  padding-top: 10px;
+  white-space: pre-wrap;
+  flex-grow: 1;
+  margin-bottom: 10px;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+.campo {
+  display: inline-block;
+  min-width: 40%;
+}
+
+.botoes-topo {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.btn-imprimir-topo {
+  padding: 10px 18px;
+  font-size: 14px;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: 10px;
+}
+
+.btn-imprimir-topo:hover {
+  background-color: #1a252f;
+}
+
+.btn-voltar-topo {
+  padding: 10px 18px;
+  font-size: 14px;
+  text-decoration: none;
+  background-color: #e0e0e0;
+  color: #333;
+  border-radius: 6px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-voltar-topo:hover {
+  background-color: #d0d0d0;
+}
+
+
+

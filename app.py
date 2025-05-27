@@ -1,0 +1,333 @@
+from flask import Flask, render_template, request, redirect, url_for, session, flash
+import sqlite3
+from datetime import datetime, timedelta
+from functools import wraps
+from urllib.parse import urlparse, parse_qs
+from markupsafe import Markup
+
+
+def login_requerido(perfis_permitidos):
+    def decorador(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            if 'usuario' not in session or session.get('perfil') not in perfis_permitidos:
+                flash("Faça login para acessar essa página.", "warning")
+                return redirect(url_for('login'))
+            return func(*args, **kwargs)
+        return wrapper
+    return decorador
+
+app = Flask(__name__)
+app.secret_key = 'chave-secreta'  # Necessário para controle de sessão
+
+#  Função para criar o banco de dados e tabelas
+def criar_banco():
+    conexao = sqlite3.connect('recados.db')
+    cursor = conexao.cursor()
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS recados (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            medico TEXT NOT NULL,
+            prioridade TEXT NOT NULL,
+            nome_paciente TEXT NOT NULL,
+            data_nascimento TEXT NOT NULL,
+            telefone TEXT NOT NULL,
+            convenio TEXT,
+            descricao TEXT,
+            status TEXT DEFAULT 'pendente',
+            usuario TEXT NOT NULL,
+            data_cadastro TEXT NOT NULL
+        )
+    """)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS usuarios (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            nome TEXT NOT NULL,
+            username TEXT NOT NULL UNIQUE,
+            senha TEXT NOT NULL,
+            perfil TEXT NOT NULL
+        )
+    """)
+    conexao.commit()
+    conexao.close()  
+
+#  Função para conectar ao banco
+def conectar_banco():
+    conexao = sqlite3.connect('recados.db')
+    conexao.row_factory = sqlite3.Row
+    return conexao
+
+# Login
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    
+    if 'usuario' in session:
+        perfil = session.get('perfil')
+        return redirect(url_for('cadastro' if perfil == 'atendente' else 'listar'))
+    
+    
+    if request.method == 'POST':
+        username = request.form['username']
+        senha = request.form['senha']
+        
+        conexao = conectar_banco()
+        cursor = conexao.cursor()
+        cursor.execute('SELECT * FROM usuarios WHERE username = ? AND senha = ?', (username, senha))
+        usuario = cursor.fetchone()
+        conexao.close()
+
+        if usuario:
+            session['usuario'] = usuario['username']
+            session['perfil'] = usuario['perfil']
+            flash('Login realizado com sucesso!', 'success')
+            if usuario['perfil'] == 'atendente':
+                return redirect(url_for('cadastro'))
+            else:
+                return redirect(url_for('listar'))
+        else:
+            flash('Usuário ou senha inválidos!', 'danger')
+    
+    return render_template('login.html')
+
+def excluir_recados_antigos():
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    limite_data = (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d %H:%M:%S')
+
+    cursor.execute('''
+        DELETE FROM recados
+        WHERE status = 'finalizado' AND data_cadastro < ?
+    ''', (limite_data,))
+    
+    print(f"{cursor.rowcount} recado(s) excluído(s).")
+
+    conexao.commit()
+    conexao.close()
+
+# 🧹 Exclusão em massa por status (só entregar / alto custo)
+@app.route('/excluir_todos/<status>', methods=['POST'])
+@login_requerido(['responsavel'])
+def excluir_todos(status):
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    cursor.execute('DELETE FROM recados WHERE status = ?', (status,))
+    conexao.commit()
+    conexao.close()
+    flash(f'Todos os recados com status \"{status}\" foram excluídos.', 'success')
+    return redirect(url_for('listar', status=status))
+
+# Logout
+@app.route('/logout')
+def logout():
+    session.clear()
+    flash('Logout realizado com sucesso!', 'success')
+    return redirect(url_for('login'))
+
+# Página de cadastro de novo recado (atendente e responsável)
+@app.route('/')
+@login_requerido(['atendente', 'responsavel'])
+def cadastro():
+    usuario = session['usuario']
+    return render_template('cadastro.html', usuario=usuario)
+
+# 📋 Página de listagem de recados por status (somente responsável)
+@app.route('/listar')
+@login_requerido(['responsavel'])
+def listar():
+    status = request.args.get('status', 'pendente')
+    busca = request.args.get('busca', '').strip()
+
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    if busca:
+        cursor.execute(
+            'SELECT * FROM recados WHERE status = ? AND nome_paciente LIKE ? ORDER BY medico, prioridade',
+            (status, f'%{busca}%')
+        )
+    else:
+        cursor.execute(
+            'SELECT * FROM recados WHERE status = ? ORDER BY medico, data_cadastro',
+            (status,)
+        )
+  
+
+    recados = cursor.fetchall()
+    conexao.close()
+    # 🔥 Organizando os recados por médico
+    recados_por_medico = {}
+    for recado in recados:
+        medico = recado['medico']
+        if medico not in recados_por_medico:
+            recados_por_medico[medico] = []
+        recados_por_medico[medico].append(recado)
+
+    quantidades_por_medico = {
+    medico: len(recados) for medico, recados in recados_por_medico.items()}
+
+    # 🎨 Gerar cores distintas para os médicos
+    cores_base = ['#3498db', '#e67e22', '#1abc9c', '#9b59b6', '#2ecc71', '#e74c3c']
+    cores_por_medico = {}
+    for i, medico in enumerate(recados_por_medico.keys()):
+        cores_por_medico[medico] = cores_base[i % len(cores_base)]
+
+    return render_template(
+        'listar.html',
+        recados_por_medico=recados_por_medico,
+        status=status,
+        cores=cores_por_medico,
+        quantidades_por_medico=quantidades_por_medico
+    )
+
+
+    
+# ❌ Exclusão individual de recado
+@app.route('/recado/<int:id>/excluir', methods=['POST'])
+@login_requerido(['responsavel'])
+def excluir_recado(id):
+    conn = conectar_banco()
+    conn.execute('DELETE FROM recados WHERE id = ?', (id,))
+    conn.commit()
+    conn.close()
+    return redirect(url_for('listar'))
+
+# 🛠 Edição de um recado específico
+@app.route('/recado/<int:id>/editar', methods=['GET', 'POST'])
+@login_requerido(['responsavel'])
+def editar_recado(id):
+    conn = conectar_banco()
+    cursor = conn.cursor()
+    
+    recado = conn.execute('SELECT * FROM recados WHERE id = ?', (id,)).fetchone()
+    medicos = cursor.execute('SELECT DISTINCT medico FROM recados').fetchall()
+
+    if request.method == 'POST':
+        medico = request.form['medico']
+        nome_paciente = request.form['nome_paciente']
+        telefone = request.form['telefone']
+        status = request.form['status']
+        prioridade = request.form['prioridade']
+        descricao = request.form['mensagem']
+
+        conn.execute('''
+            UPDATE recados
+            SET medico = ?, nome_paciente = ?, telefone = ?, status = ?, prioridade = ?, descricao = ?
+            WHERE id = ?
+        ''', (medico, nome_paciente, telefone, status, prioridade, descricao, id))
+        conn.commit()
+        conn.close()
+        return redirect(url_for('detalhar_recado', id=id))
+
+    conn.close()
+    return render_template('editar_recado.html', recado=recado, medicos=medicos)
+
+# Visualização detalhada de um recado
+@app.route('/recado/<int:id>')
+@login_requerido(['responsavel'])
+def detalhar_recado(id):
+    conn = conectar_banco()
+    recado = conn.execute('SELECT * FROM recados WHERE id = ?', (id,)).fetchone()
+    conn.close()
+    if recado is None:
+        return 'Recado não encontrado.', 404
+    return render_template('detalhar_recado.html', recado=recado)
+
+# 🔁 Atualizar o status de um recado (via dropdown)
+@app.route('/atualizar_status/<int:id>/<string:novo_status>')
+def atualizar_status(id, novo_status):
+    if 'usuario' not in session or session['perfil'] != 'responsavel':
+        return redirect(url_for('login'))
+
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    cursor.execute('UPDATE recados SET status = ? WHERE id = ?', (novo_status, id))
+    conexao.commit()
+    conexao.close()
+    flash(f'Recado atualizado para "{novo_status}" com sucesso!', 'success')
+    ref = request.referrer
+    
+    if ref:
+        parsed = urlparse(ref)
+        if '/listar' in parsed.path:
+            return redirect(ref)
+    
+    return redirect(url_for('listar', status='pendente'))
+
+# 🖨️ Imprimir todos os recados de um determinado status
+@app.route('/imprimir/<status>')
+def imprimir(status):
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    cursor.execute('SELECT * FROM recados WHERE status = ? ORDER BY medico, prioridade', (status,))
+    recados = cursor.fetchall()
+    conexao.close()
+    return render_template('imprimir_lista.html', recados=recados)
+   
+
+# 🖨️ Imprimir recado individual
+@app.route('/imprimir_recado/<int:id>', endpoint='imprimir_recado')
+@login_requerido(['responsavel'])
+def imprimir_recado(id):
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+    cursor.execute('SELECT * FROM recados WHERE id = ?', (id,))
+    recado = cursor.fetchone()
+    conexao.close()
+    if recado:
+        return render_template('imprimir_lista.html', recados=[recado])
+    else:
+        return 'Recado não encontrado.', 404
+
+# salvamento de novo recado (POST do formulário de cadastro)
+@app.route('/salvar', methods=['POST'])
+@login_requerido(['atendente', 'responsavel'])
+def salvar():
+    print("📩 Acessou salvar()")  # ← linha de debug
+
+    dados = (
+        request.form['medico'],
+        request.form['prioridade'],
+        request.form['nome_paciente'],
+        request.form['data_nascimento'],
+        request.form['telefone'],
+        request.form['convenio'],
+        request.form['descricao'],
+    )
+    print("📝 Dados recebidos:", dados)  # ← linha de debug
+
+    usuario = session['usuario']
+    status = 'pendente'
+    data_cadastro = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
+    conexao = conectar_banco()
+    cursor = conexao.cursor()
+
+    try:
+        cursor.execute('''
+            INSERT INTO recados 
+            (medico, prioridade, nome_paciente, data_nascimento, telefone, convenio, descricao, status, usuario, data_cadastro)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        ''', dados + (status, usuario, data_cadastro))
+        conexao.commit()
+        print("✅ Recado inserido com sucesso!")
+    except Exception as e:
+        print("❌ Erro ao inserir no banco:", e)
+
+    conexao.close()
+    return redirect(url_for('cadastro'))
+
+#filtro de formatacao de data
+@app.template_filter('format_data')
+def formatar_data_br(data_str):
+    try:
+        data_obj = datetime.strptime(data_str, '%Y-%m-%d %H:%M:%S')
+        return data_obj.strftime('%d/%m/%Y')
+    except:
+        return data_str  # fallback caso a string esteja mal formatada
+
+# 🚀 Rodar o app
+if __name__ == "__main__":
+    excluir_recados_antigos()  # executa antes de iniciar o app
+    app.run(debug=True)
+

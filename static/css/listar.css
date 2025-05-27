@@ -1,0 +1,463 @@
+
+      body {
+            font-family: "Inter", sans-serif;
+            background-color: #f4f6f8;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+      }
+
+      .toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 9999;
+            pointer-events: none;
+      }
+
+      .toast {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            padding: 12px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+            width: fit-content;
+            text-align: center;
+            opacity: 1;
+            z-index: 9999;
+        }
+
+      body.fundo {
+            background: url("/static/Fundo_typeform.jpg") no-repeat center center
+            fixed;
+            background-size: cover;
+      }
+      .dropdown {
+            position: relative;
+            display: inline-block;
+            z-index: 100;
+        }
+      .dropbtn {
+            background-color: #ecf0f1;
+            color: #34495e;
+            padding: 6px 10px;
+            font-size: 13px;
+            border: none;
+            cursor: pointer;
+            border-radius: 6px;
+        }
+
+      .dropdown-content {
+            display: none;
+            position: absolute;
+            top: auto;
+            left: 0;
+            background-color: #fff;
+            min-width: 160px;
+            border-radius: 6px;
+            box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            bottom: 100%;
+        }
+
+      .dropdown-content a {
+            display: block;
+            padding: 10px 15px;
+            color: #34495e;
+            text-decoration: none;
+            border-bottom: 1px solid #eee;
+        }
+
+      .dropdown-content a:last-child {
+            border-bottom: none;
+        }
+
+      .dropdown-content a:hover {
+            background-color: #f0f0f0;
+        }
+
+      .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+      td {
+            word-break: break-word;
+        }
+
+      .container {
+        background-color: rgba(
+          255,
+          255,
+          255,
+          0.9
+        ); /* branco com transparência */
+        max-width: 95%;
+        margin: 50px auto;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+      }
+
+      h1 {
+        text-align: center;
+        color: #34495e;
+      }
+      h2 {
+        text-align: center;
+        color: #34495e;
+      }
+      .menu,
+      .status-filtro,
+      .imprimir {
+        text-align: center;
+        margin: 15px 0;
+      }
+
+      .menu a,
+      .imprimir a {
+            margin: 0 8px;
+            padding: 6px 12px;
+            color: #fff;
+            background-color: #3498db;
+            text-decoration: none;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+
+      .status-filtro a {
+            margin: 0 8px;
+            padding: 6px 12px;
+            text-decoration: none;
+            border-radius: 6px;
+            display: inline-block;
+            font-weight: 500;
+            background-color: #bdc3c7;
+            color: #2c3e50;
+            transition: background-color 0.3s;
+        }
+
+        .status-filtro a.ativo.pendente {
+            background-color: #e74c3c;
+            }
+        .status-filtro a.ativo.imprimir {
+            background-color: #3498db;
+            }
+        .status-filtro a.ativo.solicitado_ao_medico {
+            background-color: #f39c12;
+            }
+        .status-filtro a.ativo.respondido {
+            background-color: #27ae60;
+            }
+        .status-filtro a.ativo.passar_cartao {
+            background-color: #8e44ad;
+            }
+        .status-filtro a.ativo.so_entregar {
+            background-color: #16a085;
+            }
+        .status-filtro a.ativo.alto_custo {
+            background-color: #c0392b;
+            }
+
+      .imprimir-bloco a {
+        margin: 0 8px;
+        padding: 6px 12px;
+        color: #fff;
+        background-color: #3498db;
+        text-decoration: none;
+        border-radius: 6px;
+        display: inline-block;
+        font-weight: 500;
+        transition: background-color 0.3s;
+      }
+
+      .btn-imprimir {
+        display: inline-block;
+        margin-left: 8px;
+        padding: 6px 8px;
+        font-size: 18px;
+        background-color: #f5f5f5;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        text-decoration: none;
+        color: #333;
+        transition: background-color 0.3s;
+      }
+
+      .btn-imprimir:hover {
+        background-color: #e0e0e0;
+        cursor: pointer;
+      }
+
+      .pendente {
+        background-color: #e74c3c;
+      }
+      .imprimir {
+        background-color: #3498db;
+      }
+      .solicitado_ao_medico {
+        background-color: #f39c12;
+      }
+      .respondido {
+        background-color: #27ae60;
+      }
+      .passar_cartao {
+        background-color: #8e44ad;
+      }
+      .so_entregar {
+        background-color: #16a085;
+      }
+      .alto_custo {
+        background-color: #c0392b;
+      }
+
+      /* Accordion Style */
+      .accordion {
+        background-color: #3498db;
+        color: white;
+        cursor: pointer;
+        padding: 10px;
+        width: 100%;
+        border: none;
+        text-align: left;
+        outline: none;
+        transition: background-color 0.3s ease;
+        margin-top: 10px;
+        border-radius: 6px;
+        font-weight: 500;
+      }
+
+      .active,
+      .accordion:hover {
+        background-color: #2980b9;
+      }
+
+      .panel {
+        padding: 10px;
+        display: none;
+        background-color: white;
+        border-radius: 6px;
+        border: 1px solid #ddd;
+        margin-bottom: 10px;
+        overflow: visible;
+        position: relative;
+        z-index: 0;
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        overflow-x: auto;
+      }
+
+      th,
+      td {
+        padding: 10px 12px;
+        text-align: center;
+        border-bottom: 1px solid #ddd;
+      }
+
+      th {
+        background-color: #ecf0f1;
+        position: sticky;
+        top: 0;
+        z-index: 2;
+      }
+
+      tr:hover {
+        background-color: #f1f1f1;
+      }
+
+      .status {
+        padding: 6px 10px;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        display: inline-block;
+      }
+
+      @media screen and (max-width: 768px) {
+        table,
+        thead,
+        tbody,
+        th,
+        td,
+        tr {
+          display: block;
+        }
+        th {
+          display: none;
+        }
+        td {
+          border: none;
+          position: relative;
+          padding-left: 50%;
+          text-align: left;
+        }
+        td::before {
+          position: absolute;
+          top: 10px;
+          left: 10px;
+          width: 45%;
+          white-space: nowrap;
+          font-weight: bold;
+          color: #7f8c8d;
+        }
+        td:nth-of-type(1)::before {
+          content: "Médico";
+        }
+        td:nth-of-type(2)::before {
+          content: "Prioridade";
+        }
+        td:nth-of-type(3)::before {
+          content: "Paciente";
+        }
+        td:nth-of-type(4)::before {
+          content: "Telefone";
+        }
+        td:nth-of-type(5)::before {
+          content: "Status";
+        }
+        td:nth-of-type(6)::before {
+          content: "Ações";
+        }
+      }
+      .titulo-status {
+        color: white;
+        padding: 12px;
+        margin-bottom: 20px;
+        border-radius: 6px;
+        font-size: 24px;
+        text-align: center;
+      }
+      .btn-imprimir-status {
+        padding: 6px 12px;
+        color: white;
+        text-decoration: none;
+        border-radius: 6px;
+        font-weight: bold;
+        margin: 8px;
+        display: inline-block;
+      }
+      .status-filtro a.ativo {
+        font-weight: bold;
+        color: white;
+        border-radius: 6px;
+        padding: 6px 12px;
+        text-decoration: none;
+      }
+
+      /* Botão estilizado para nome do paciente */
+.btn-paciente {
+  display: inline-block;
+  background-color: #ecf0f1;
+  color: #2c3e50;
+  padding: 6px 10px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 500;
+  max-width: 180px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: background-color 0.3s;
+}
+
+.btn-paciente:hover {
+  background-color: #dce3e6;
+}
+
+
+td .prioridade {
+  font-size: 12px;
+  font-weight: 600;
+  max-width: 120px;
+  display: inline-block;
+  white-space: normal;
+  line-height: 1.2;
+  word-wrap: break-word;
+}
+
+
+/* Fixar larguras mínimas para colunas finais */
+td:nth-child(6) { min-width: 90px; }  /* Status */
+td:nth-child(7) { min-width: 130px; } /* Ações */
+td:nth-child(8) { min-width: 90px; }  /* Solicitado por */
+
+th, td {
+  vertical-align: middle;
+}
+
+/* Mensagem em preview com largura controlada */
+td .mensagem-preview {
+  font-size: 12px;
+  max-width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: inline-block;
+  vertical-align: middle;
+}
+.campo-busca {
+  text-align: center;
+  margin: 20px 0;
+}
+
+.campo-busca input[type="text"] {
+  padding: 6px 10px;
+  width: 220px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 14px;
+}
+
+.campo-busca button {
+  padding: 6px 12px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  margin-left: 6px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.campo-busca button:hover {
+  background-color: #2980b9;
+}
+
+.finalizado {
+  background-color: #7f8c8d;
+}
+
+.status.finalizado {
+  background-color: #7f8c8d;
+}
+
+.ativo.finalizado {
+  background-color: #7f8c8d;
+  color: white;
+}
+.coluna-data {
+    width: 100px;
+    white-space: nowrap;
+    font-size: 14px;
+    text-align: center;
+}
+.badge-contador {
+    background-color: rgba(255, 255, 255, 0.95); /* leve contraste branco */
+    color: #333; /* texto escuro para legibilidade */
+    padding: 2px 8px;
+    margin-left: 8px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+}
+
+

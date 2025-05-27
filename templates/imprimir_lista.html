@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Impressão de Recados</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/imprimir_lista.css') }}">
+</head>
+<body>
+    <div class="no-print botoes-topo">
+        <button onclick="window.print()" class="btn-imprimir-topo">🖨️ Imprimir todos</button>
+        <a href="{{ url_for('listar') }}" class="btn-voltar-topo">🔙 Voltar</a>
+    </div>
+
+
+    {% for recado in recados %}
+        <div class="recado">
+        <div class="linha-topo">
+            <span class="campo"><strong>Médico:</strong> {{ recado['medico'] }}</span>
+            <span class="campo"><strong>Prioridade:</strong> {{ recado['prioridade'] }}</span>
+        </div>
+
+        <div class="paciente">{{ recado['nome_paciente'] }}</div>
+        <div class="subinfo">Nascimento: {{ recado['data_nascimento'] }}</div>
+
+        <div class="linha-meio">
+            <span class="campo"><strong>Telefone:</strong> {{ recado['telefone'] }}</span>
+            <span class="campo"><strong>Convênio:</strong> {{ recado['convenio'] }}</span>
+        </div>
+
+        <div class="descricao">
+            {{ recado['descricao'] }}
+        </div>
+
+        <div class="linha-rodape">
+            <span>
+                <strong>Solicitado por:</strong> {{ recado['usuario'] }}
+            </span>
+            <span>
+                <strong>Data:</strong>{{ recado['data_cadastro']|format_data }}
+            </span> 
+        </div>
+        </div>
+
+    {% endfor %}
+
+</body>
+</html>

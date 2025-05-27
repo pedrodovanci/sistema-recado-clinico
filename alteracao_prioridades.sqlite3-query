@@ -1,0 +1,2 @@
+-- database: ./recados.db
+SELECT DISTINCT prioridade FROM recados;

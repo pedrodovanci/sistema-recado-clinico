@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Editar Recado</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/editar.css') }}">
+
+</head>
+<body class="fundo">
+    <div class="imagem_fundo">
+        <div class="container">
+            <h2>Editar Recado</h2>
+            <form method="POST">
+                <label>Médico:</label>
+                <select name="medico" required>
+                    {% set lista_medicos = [
+                        "Dr. Andre Salotto Rocha", "Dr. Fabiano Morais Nogueira", 
+                        "Dr. Mario Jose Goes", "Dr. Dionei Freitas de Morais", 
+                        "Dr. Felipe Oliveira Rodrigues", "Dra. Raysa Moreira Aprigio", 
+                        "Dr. Eduardo Carlos da Silva", "Dr. Lucas Crociati Meguins", 
+                        "Dr. Sergio Luiz Ramin", "Dr. Carlos Rocha", "Dr. Luis Fernando", 
+                        "Dr. Linoel Curado Valsechi", "Dr. Ricardo Lourenço Caramanti", 
+                        "Dr. Alexandre Laranjeira Junior", "Dr. Caique Alberto Dosualdo", 
+                        "Dr. Demosthenes Santana", "Dr. Matheus Laurenti"
+                    ] %}
+                    {% for nome in lista_medicos %}
+                        <option value="{{ nome }}" {% if nome == recado.medico %}selected{% endif %}>{{ nome }}</option>
+                    {% endfor %}
+                </select>
+
+                <label>Nome do Paciente:</label>
+                <input type="text" name="nome_paciente" value="{{ recado.nome_paciente }}" required>
+
+                <label>Telefone:</label>
+                <input type="text" name="telefone" value="{{ recado.telefone }}" required>
+
+                <label>Status:</label>
+                <select name="status" required>
+                    <option value="pendente" {% if recado.status == 'pendente' %}selected{% endif %}>Pendente</option>
+                    <option value="imprimir" {% if recado.status == 'imprimir' %}selected{% endif %}>Imprimir</option>
+                    <option value="concluido" {% if recado.status == 'concluido' %}selected{% endif %}>Concluído</option>
+                </select>
+
+                <label>Prioridade:</label>
+                <select name="prioridade" required>
+                    <option value="Alta" {% if recado.prioridade == 'Alta' %}selected{% endif %}>Alta</option>
+                    <option value="Média" {% if recado.prioridade == 'Média' %}selected{% endif %}>Média</option>
+                    <option value="Baixa" {% if recado.prioridade == 'Baixa' %}selected{% endif %}>Baixa</option>
+                </select>
+
+                <label>Mensagem:</label>
+                <textarea name="mensagem" style="text-align:left; padding:10px; line-height:1.5; white-space:pre-wrap;">{{ recado.descricao }}</textarea>
+                <button type="submit">Salvar Alterações</button>
+                <a href="{{ url_for('detalhar_recado', id=recado.id) }}">Cancelar</a>
+            </form>
+         </div>   
+    </div>   
+</body>
+</html>
