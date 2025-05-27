@@ -1,0 +1,13 @@
+# Ignorar cache e banco local
+__pycache__/
+*.pyc
+*.db
+
+# Backups
+*.sqlite*
+*.bak
+*.old
+
+# Ambiente virtual (caso use futuramente)
+venv/
+.env
