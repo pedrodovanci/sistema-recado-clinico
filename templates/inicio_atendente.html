@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Bem-vindo(a)</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/inicio_atendente.css') }}">
+</head>
+<body>
+  <div class="container">
+        <h1>Olá, {{ usuario }}!</h1>
+        <div class="btn-grupo">
+        <a href="{{ url_for('cadastro_recado') }}" class="btn">+ Novo Recado</a>
+        <a href="{{ url_for('entregar_recado') }}" class="btn">📤 Entregar Recado</a>
+    </div>
+
+    <br>
+
+    <a href="{{ url_for('logout') }}" class="btn sair">↩ Voltar ao Login</a>
+
+</body>
+</html>

@@ -125,11 +125,46 @@ def logout():
     return redirect(url_for('login'))
 
 # Página de cadastro de novo recado (atendente e responsável)
-@app.route('/')
+@app.route('/',endpoint = 'inicio')
 @login_requerido(['atendente', 'responsavel'])
 def cadastro():
     usuario = session['usuario']
-    return render_template('cadastro.html', usuario=usuario)
+    if session['perfil'] == 'atendente':
+        return render_template('inicio_atendente.html', usuario=usuario)
+    else:
+        return redirect(url_for('listar'))
+
+@app.route('/cadastro_recado')
+@login_requerido(['atendente'])
+def cadastro_recado():
+    usuario = session['usuario']
+    return render_template('cadastro_recado.html', usuario=usuario)
+    
+@app.route('/entregar', methods=['GET', 'POST'])
+@login_requerido(['atendente'])
+def entregar_recado():
+    resultados = {}
+    busca = ''
+    if request.method == 'POST':
+        busca = request.form['busca'].strip()
+        if busca:
+            conexao = conectar_banco()
+            cursor = conexao.cursor()
+            cursor.execute('SELECT * FROM recados WHERE nome_paciente LIKE ?', (f'%{busca}%',))
+            recados = cursor.fetchall()
+            conexao.close()
+
+            for recado in recados:
+                status = recado['status']
+                if status not in resultados:
+                    resultados[status] = {}
+                medico = recado['medico']
+                if medico not in resultados[status]:
+                    resultados[status][medico] = []
+                resultados[status][medico].append(recado)
+
+    return render_template('entregar_recado.html', resultados=resultados, busca=busca)
+
 
 # 📋 Página de listagem de recados por status (somente responsável)
 @app.route('/listar')
@@ -236,7 +271,7 @@ def detalhar_recado(id):
 # 🔁 Atualizar o status de um recado (via dropdown)
 @app.route('/atualizar_status/<int:id>/<string:novo_status>')
 def atualizar_status(id, novo_status):
-    if 'usuario' not in session or session['perfil'] != 'responsavel':
+    if 'usuario' not in session or session.get('perfil') not in ['responsavel', 'atendente']:
         return redirect(url_for('login'))
 
     conexao = conectar_banco()
@@ -244,15 +279,23 @@ def atualizar_status(id, novo_status):
     cursor.execute('UPDATE recados SET status = ? WHERE id = ?', (novo_status, id))
     conexao.commit()
     conexao.close()
+
     flash(f'Recado atualizado para "{novo_status}" com sucesso!', 'success')
+
     ref = request.referrer
-    
     if ref:
         parsed = urlparse(ref)
         if '/listar' in parsed.path:
             return redirect(ref)
-    
-    return redirect(url_for('listar', status='pendente'))
+        elif '/entregar' in parsed.path:
+            return redirect(url_for('entregar_recado'))
+
+    # fallback padrão por segurança
+    if session['perfil'] == 'responsavel':
+        return redirect(url_for('listar', status='pendente'))
+    else:
+        return redirect(url_for('inicio'))
+
 
 # 🖨️ Imprimir todos os recados de um determinado status
 @app.route('/imprimir/<status>')

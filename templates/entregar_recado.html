@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<style>
+    .container {
+        max-width: 95%;
+        margin: 40px auto;
+        padding: 20px;
+        border-radius: 12px;
+        background-color: rgba(255, 255, 255, 0.95);
+        box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
+    }
+
+    .panel table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #fff;
+        border-radius: 6px;
+        overflow: hidden;
+    }
+
+    .panel th,
+    .panel td {
+        padding: 12px 14px;
+        text-align: center;
+        border-bottom: 1px solid #e0e0e0;
+        vertical-align: middle;
+        font-size: 14px;
+    }
+
+    .panel td:nth-child(3) {
+        max-width: 280px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        }
+
+    .status {
+        padding: 6px 12px;
+        border-radius: 6px;
+        color: white;
+        font-weight: bold;
+        display: inline-block;
+        text-transform: capitalize;
+        }
+
+    .status.pendente {
+        background-color: #e74c3c;
+    }
+
+    .status.finalizado {
+        background-color: #7f8c8d;
+    }
+
+    .btn-imprimir {
+        padding: 6px 12px;
+        background-color: #ecf0f1;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-imprimir:hover {
+        background-color: #dcdcdc;
+    }
+    
+    .titulo-status {
+        color: white;
+        padding: 12px;
+        border-radius: 6px;
+        font-size: 22px;
+        text-align: center;
+        margin-top: 30px;  /* 👈 adiciona espaço antes */
+        margin-bottom: 15px;
+   }
+    .btn-voltar {
+        background-color: #bdc3c7;
+        color: #2c3e50;
+        padding: 8px 14px;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: bold;
+        transition: background-color 0.3s ease;
+    }
+
+    .btn-voltar:hover {
+        background-color: #95a5a6;
+    }
+
+</style>
+<head>
+  <meta charset="UTF-8">  
+  <title>Entregar Recado</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/listar.css') }}">
+</head>
+<body class="fundo">
+    
+    <div style="text-align: center; margin-bottom: 20px;">
+        <a href="{{ url_for('inicio') }}" class="btn-voltar">Voltar<a>
+    </div>
+  <div class="container">
+    <h1>Digite o nome do paciente para encontrar seu recado</h1>
+    <form method="POST" class="campo-busca">
+      <input type="text" name="busca" placeholder="Nome do paciente..." value="{{ busca }}" required>
+      <button type="submit">🔍 Buscar</button>
+    </form>
+
+    {% if resultados %}
+      {% for status, medicos in resultados.items() %}
+        <div class="titulo-status {{ status }}">{{ status.replace('_', ' ').capitalize() }}</div>
+        {% for medico, recados in medicos.items() %}
+          <button class="accordion">{{ medico }}</button>
+          <div class="panel">
+            <table>
+              <thead>
+                <tr>
+                  <th>Paciente</th>
+                  <th>Telefone</th>
+                  <th>Mensagem</th>
+                  <th>Status</th>
+                  <th>Ação</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for r in recados %}
+                <tr>
+                  <td>{{ r['nome_paciente'] }}</td>
+                  <td>{{ r['telefone'] }}</td>
+                  <td>{{ r['descricao'] }}</td>
+                  <td><span class="status {{ r['status'] }}">{{ r['status'] }}</span></td>
+                  <td>
+                    <a href="{{ url_for('atualizar_status', id=r['id'], novo_status='finalizado') }}" class="btn-imprimir">Finalizar</a>
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+        {% endfor %}
+      {% endfor %}
+    {% elif busca %}
+      <p><strong>Recado não encontrado.</strong></p>
+    {% endif %}
+  </div>
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+  {% if mensagens %}
+    <div class="toast-container">
+      {% for categoria, msg in mensagens %}
+        <div class="toast {{ categoria }}">✅ {{ msg.replace('_', ' ') }}</div>
+      {% endfor %}
+    </div>
+  {% endif %}
+{% endwith %}
+
+<script>
+  window.addEventListener("load", function () {
+    const toasts = document.querySelectorAll(".toast");
+    toasts.forEach((toast) => {
+      setTimeout(() => {
+        toast.style.transition = "opacity 1s ease";
+        toast.style.opacity = "0";
+        setTimeout(() => {
+          toast.remove();
+        }, 1000);
+      }, 5000); // 5s visível
+    });
+  });
+</script>
+
+  <script>
+    const acc = document.getElementsByClassName("accordion");
+    for (let i = 0; i < acc.length; i++) {
+      acc[i].addEventListener("click", function () {
+        this.classList.toggle("active");
+        const panel = this.nextElementSibling;
+        panel.style.display = panel.style.display === "block" ? "none" : "block";
+      });
+    }
+  </script>
+</body>
+</html>
