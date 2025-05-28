@@ -97,7 +97,7 @@ def excluir_recados_antigos():
 
     cursor.execute('''
         DELETE FROM recados
-        WHERE status = 'finalizado' AND data_cadastro < ?
+        WHERE status = 'entregue' AND data_cadastro < ?
     ''', (limite_data,))
     
     print(f"{cursor.rowcount} recado(s) excluído(s).")
@@ -141,7 +141,7 @@ def cadastro_recado():
     return render_template('cadastro_recado.html', usuario=usuario)
     
 @app.route('/entregar', methods=['GET', 'POST'])
-@login_requerido(['atendente'])
+@login_requerido(['atendente', 'responsavel'])
 def entregar_recado():
     resultados = {}
     busca = ''
@@ -170,7 +170,8 @@ def entregar_recado():
 @app.route('/listar')
 @login_requerido(['responsavel'])
 def listar():
-    status = request.args.get('status', 'pendente')
+    status = request.args.get('status', 'pendente')    
+
     busca = request.args.get('busca', '').strip()
 
     conexao = conectar_banco()
@@ -295,7 +296,7 @@ def atualizar_status(id, novo_status):
     conexao = conectar_banco()
     cursor = conexao.cursor()
 
-    if novo_status == 'finalizado':
+    if novo_status == 'entregue':
         finalizador = session['usuario']
         cursor.execute('UPDATE recados SET status = ?, finalizado_por = ? WHERE id = ?', (novo_status, finalizador, id))
     else:
@@ -304,7 +305,7 @@ def atualizar_status(id, novo_status):
     conexao.commit()
     conexao.close()
 
-    flash(f'Recado atualizado para "{novo_status}" com sucesso!', 'success')
+    flash('Recado marcado como entregue com sucesso!', 'success')
 
     ref = request.referrer
     if ref:
@@ -396,5 +397,5 @@ def formatar_data_br(data_str):
 # 🚀 Rodar o app
 if __name__ == "__main__":
     excluir_recados_antigos()  # executa antes de iniciar o app
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=5000, debug=True)
 

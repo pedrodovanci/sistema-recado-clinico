@@ -7,7 +7,7 @@ __pycache__/
 *.sqlite*
 *.bak
 *.old
-
+*.alteracao_prioridades.sqlite3-query*
 # Ambiente virtual (caso use futuramente)
 venv/
 .env

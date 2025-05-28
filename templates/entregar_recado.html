@@ -107,7 +107,14 @@
 
     {% if resultados %}
       {% for status, medicos in resultados.items() %}
-        <div class="titulo-status {{ status }}">{{ status.replace('_', ' ').capitalize() }}</div>
+        <div class="titulo-status {{ status }}">
+          {% if status == 'entregue' %}
+            Entregue
+          {% else %}
+            {{ status.replace('_', ' ').capitalize() }}
+          {% endif %}
+        </div>
+
         {% for medico, recados in medicos.items() %}
           <button class="accordion">{{ medico }}</button>
           <div class="panel">
@@ -127,9 +134,18 @@
                   <td>{{ r['nome_paciente'] }}</td>
                   <td>{{ r['telefone'] }}</td>
                   <td>{{ r['descricao'] }}</td>
-                  <td><span class="status {{ r['status'] }}">{{ r['status'] }}</span></td>
                   <td>
-                    <a href="{{ url_for('atualizar_status', id=r['id'], novo_status='finalizado') }}" class="btn-imprimir">Finalizar</a>
+                    <span class="status {{ r['status'] }}">
+                      {% if r['status'] == 'finalizado' %}
+                        Entregue
+                      {% else %}
+                        {{ r['status'] }}
+                      {% endif %}
+                    </span>
+                  </td>
+
+                  <td>
+                    <a href="{{ url_for('atualizar_status', id=r['id'], novo_status='entregue') }}" class="btn-imprimir">Entregar</a>
                   </td>
                 </tr>
                 {% endfor %}

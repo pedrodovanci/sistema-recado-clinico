@@ -15,13 +15,18 @@
 
         <div class="container">
         <h1>Recados</h1>
-        <h2>Status: {{ status.replace('_', ' ')|capitalize }}</h2>
+        <h2>Status: 
+            {% if status == 'entregue' %}Entregue
+                {% else %}{{ status.replace('_', ' ')|capitalize }}
+            {% endif %}
+        </h2>
 
         <div class="menu">
             <a href="{{ url_for('cadastro_recado') }}">+ Novo Recado</a>
-            <!--<a href="{{ url_for('logout') }}">Sair-->
+            <a href="{{ url_for('entregar_recado') }}">📤 Entregar Recado</a>
             <a href="{{ url_for('listar', status='pendente') }}">Ver Pendentes</a>
         </div>
+
 
         <div class="status-filtro">
             <strong>Filtrar por Status:</strong><br />
@@ -39,7 +44,7 @@
             
             <a href="{{ url_for('listar', status='alto_custo') }}"class="{% if status == 'alto_custo' %}ativo alto_custo{% endif %}" >Alto Custo</a>
 
-            <a href="{{ url_for('listar', status='finalizado') }}" class="{% if status == 'finalizado' %}ativo finalizado{% endif %}">Finalizados</a>
+            <a href="{{ url_for('listar', status='entregue') }}" class="{% if status == 'entregue' %}ativo entregue{% endif %}">Entregues</a>
         </div>   
 
         <div class="imprimir-bloco">
@@ -51,8 +56,8 @@
             >Todos deste status</a
             >
         </div>
-            {% if status == 'finalizado' %}
-            <form action="{{ url_for('excluir_todos', status=status) }}" method="post" onsubmit="return confirm('Tem certeza que deseja excluir TODOS os recados FINALIZADOS?');">
+            {% if status == 'entregue' %}
+            <form action="{{ url_for('excluir_todos', status=status) }}" method="post" onsubmit="return confirm('Tem certeza que deseja excluir TODOS os recados ENTREGUES?');">
                 <button type="submit" style="margin: 10px 0; background-color: #e74c3c; color: white; padding: 8px 16px; border: none; border-radius: 6px; font-weight: bold;">
                     Excluir todos os recados
                 </button>
@@ -94,16 +99,20 @@
                     
                     <td>{{ r['telefone'] }}</td>
                     <td>{{ r['data_cadastro']|format_data }}</td>
-                
+
                     <td><span class="mensagem-preview">{{ r['descricao'] }}</span></td>
 
-                    
                     <td>
                         <span class="status {{ r['status']|replace(' ', '_') }}">
-                            {{ r['status'].replace('_', ' ') }}
+                            {% if r['status'] == 'entregue' %}
+                                Entregue
+                            {% else %}
+                                {{ r['status'].replace('_', ' ') }}
+                            {% endif %}
                         </span>
                     </td>            
-                <td>
+                    <td>
+
                         <div class="dropdown">
                             <button class="dropbtn">Alterar Status</button>
                         
@@ -123,7 +132,7 @@
                                 
                                 <a href="{{ url_for('atualizar_status', id=r['id'], novo_status='alto_custo') }}">Alto Custo</a>
                                 
-                                <a href="{{ url_for('atualizar_status', id=r['id'], novo_status='finalizado') }}">Finalizados</a>
+                                <a href="{{ url_for('atualizar_status', id=r['id'], novo_status='entregue') }}">Entregue</a>
 
                             </div>
                         </div>
@@ -131,10 +140,11 @@
                     </td>
                     <td>
                         Solicitado por: {{ r['usuario'] }}<br>
-                        {% if r['status'] == 'finalizado' %}
-                            Finalizado por: {{ r['finalizado_por'] or '---' }}
+                        {% if r['status'] == 'entregue' %}
+                            Entregue por: {{ r['finalizado_por'] or '---' }}
                         {% endif %}
                     </td>
+
 
                 </tr>
                 {% endfor %}

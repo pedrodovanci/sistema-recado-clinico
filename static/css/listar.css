@@ -434,18 +434,17 @@ td .mensagem-preview {
   background-color: #2980b9;
 }
 
-.finalizado {
+.entregue {
   background-color: #7f8c8d;
 }
-
-.status.finalizado {
+.status.entregue {
   background-color: #7f8c8d;
 }
-
-.ativo.finalizado {
+.ativo.entregue {
   background-color: #7f8c8d;
   color: white;
 }
+
 .coluna-data {
     width: 100px;
     white-space: nowrap;
