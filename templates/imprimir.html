@@ -69,7 +69,8 @@
 
     <div class="paciente">{{ recado['nome_paciente'] }}</div>
 
-    <div class="nascimento">Nascimento: {{ recado['data_nascimento'] }}</div>
+    <div class="nascimento">nascimento: {{ recado['data_nascimento']|strftime('%d/%m/%Y') }} </div>
+
 
     <div class="prioridade">Prioridade: {{ recado['prioridade'] }}</div>
 

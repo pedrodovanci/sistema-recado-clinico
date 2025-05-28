@@ -2,8 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for, session, f
 import sqlite3
 from datetime import datetime, timedelta
 from functools import wraps
-from urllib.parse import urlparse, parse_qs
-from markupsafe import Markup
+from urllib.parse import urlparse, parse_qs 
 
 
 def login_requerido(perfis_permitidos):
@@ -195,7 +194,7 @@ def listar():
     recados_por_medico = {}
     for recado in recados:
         medico = recado['medico']
-        print(f"[DEBUG] Médico no banco: '{medico}'")
+        
 
         if medico not in recados_por_medico:
             recados_por_medico[medico] = []
@@ -222,7 +221,8 @@ def listar():
     "Dr. Alexandre Laranjeira Junior": "#27ae60",
     "Dr. Caique Alberto Dosualdo": "#d35400",
     "Dr. Demosthenes Santana": "#34495e",
-    "Dr. Matheus Laurenti": "#0ef8c9"
+    "Dr. Matheus Laurenti": "#0ef8c9",
+    "Dr. Sebastiao Silva": "#014217"
 }
 
 
@@ -334,24 +334,42 @@ def imprimir(status):
    
 
 # 🖨️ Imprimir recado individual
+
+
+from datetime import datetime
+
 @app.route('/imprimir_recado/<int:id>', endpoint='imprimir_recado')
 @login_requerido(['responsavel'])
 def imprimir_recado(id):
     conexao = conectar_banco()
     cursor = conexao.cursor()
     cursor.execute('SELECT * FROM recados WHERE id = ?', (id,))
-    recado = cursor.fetchone()
+    row = cursor.fetchone()
     conexao.close()
-    if recado:
+
+    if row:
+        recado = dict(row)  # Converte para dicionário mutável
+
+        # ✅ Converte datas do banco para objetos datetime
+        try:
+            nascimento = datetime.strptime(recado['data_nascimento'], '%Y-%m-%d')
+            recado['data_nascimento_formatada'] = nascimento.strftime('%d/%m/%Y')
+
+            cadastro = datetime.strptime(recado['data_cadastro'], '%Y-%m-%d %H:%M:%S')
+            recado['data_cadastro_formatada'] = cadastro.strftime('%d/%m/%Y %H:%M')
+        except:
+            recado['data_nascimento_formatada'] = recado['data_nascimento']
+            recado['data_cadastro_formatada'] = recado['data_cadastro']
+
         return render_template('imprimir_lista.html', recados=[recado])
     else:
         return 'Recado não encontrado.', 404
 
+    
 # salvamento de novo recado (POST do formulário de cadastro)
 @app.route('/salvar', methods=['POST'])
 @login_requerido(['atendente', 'responsavel'])
 def salvar():
-    print("📩 Acessou salvar()")  # ← linha de debug
 
     dados = (
         request.form['medico'],
@@ -362,7 +380,7 @@ def salvar():
         request.form['convenio'],
         request.form['descricao'],
     )
-    print("📝 Dados recebidos:", dados)  # ← linha de debug
+    
 
     usuario = session['usuario']
     status = 'pendente'

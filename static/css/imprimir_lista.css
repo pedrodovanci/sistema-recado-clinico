@@ -6,24 +6,32 @@
 
 body {
   font-family: Arial, sans-serif;
-  margin: 0;
+  margin: 20px auto;
   padding: 0;
+  background-color: #f2f2f2; /* cor clara de fundo para realce do bloco */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
+
 .recado {
-  width: 19cm;
-  height: 14cm;
+  width: 100%;
+  max-width: 21cm;
   margin: 1cm auto;
-  padding: 20px;
-  border: 1px solid #000;
-  page-break-after: always;
+  padding: 20px 25px;
   box-sizing: border-box;
+  page-break-after: always;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   text-transform: uppercase;
-
+  border: none; /* Remove borda externa */
+  box-shadow: 0 0 5px rgba(0, 0, 0, 0.2); /* Sombra leve para visualização na tela */
+  background-color: white;
 }
+
+
 
 .linha-topo, .linha-meio, .linha-rodape {
   display: flex;
@@ -95,6 +103,19 @@ body {
 .btn-voltar-topo:hover {
   background-color: #d0d0d0;
 }
+@media print {
+  body {
+    background-color: white;
+  }
+  .no-print {
+    display: none;
+  }
+  .recado {
+    box-shadow: none;
+    margin: 0;
+  }
+}
+
 
 
 

@@ -22,7 +22,7 @@
                         "Dr. Sergio Luiz Ramin", "Dr. Carlos Rocha", "Dr. Luis Fernando", 
                         "Dr. Linoel Curado Valsechi", "Dr. Ricardo Lourenço Caramanti", 
                         "Dr. Alexandre Laranjeira Junior", "Dr. Caique Alberto Dosualdo", 
-                        "Dr. Demosthenes Santana", "Dr. Matheus Laurenti"
+                        "Dr. Demosthenes Santana", "Dr. Matheus Laurenti", "Dr. Sebastiao Silva"
                     ] %}
                     {% for nome in lista_medicos %}
                         <option value="{{ nome }}" {% if nome == recado.medico %}selected{% endif %}>{{ nome }}</option>
@@ -44,10 +44,11 @@
 
                 <label>Prioridade:</label>
                 <select name="prioridade" required>
-                    <option value="Alta" {% if recado.prioridade == 'Alta' %}selected{% endif %}>Alta</option>
-                    <option value="Média" {% if recado.prioridade == 'Média' %}selected{% endif %}>Média</option>
-                    <option value="Baixa" {% if recado.prioridade == 'Baixa' %}selected{% endif %}>Baixa</option>
+                    <option value="Urgência - até 24 horas" {% if recado.prioridade == 'Urgência - até 24 horas' %}selected{% endif %}>Urgência - até 24 horas</option>
+                    <option value="Urgência eletiva - até 3 dias" {% if recado.prioridade == 'Urgência eletiva - até 3 dias' %}selected{% endif %}>Urgência eletiva - até 3 dias</option>
+                    <option value="Eletiva" {% if recado.prioridade == 'Eletiva' %}selected{% endif %}>Eletiva</option>
                 </select>
+
 
                 <label>Mensagem:</label>
                 <textarea name="mensagem" style="text-align:left; padding:10px; line-height:1.5; white-space:pre-wrap;">{{ recado.descricao }}</textarea>

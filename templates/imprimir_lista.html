@@ -8,7 +8,7 @@
 <body>
     <div class="no-print botoes-topo">
         <button onclick="window.print()" class="btn-imprimir-topo">🖨️ Imprimir todos</button>
-        <a href="{{ url_for('listar') }}" class="btn-voltar-topo">🔙 Voltar</a>
+        <a href="{{ url_for('listar') }}" class="btn-voltar-topo">Voltar</a>
     </div>
 
 
@@ -20,7 +20,8 @@
         </div>
 
         <div class="paciente">{{ recado['nome_paciente'] }}</div>
-        <div class="subinfo">Nascimento: {{ recado['data_nascimento'] }}</div>
+        <div class="subinfo">Nascimento: {{ recado['data_nascimento_formatada'] }}</div>
+            
 
         <div class="linha-meio">
             <span class="campo"><strong>Telefone:</strong> {{ recado['telefone'] }}</span>
