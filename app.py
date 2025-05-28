@@ -222,7 +222,10 @@ def listar():
     "Dr. Caique Alberto Dosualdo": "#d35400",
     "Dr. Demosthenes Santana": "#34495e",
     "Dr. Matheus Laurenti": "#0ef8c9",
-    "Dr. Sebastiao Silva": "#014217"
+    "Dr. Sebastiao Silva": "#014217",
+    "Dr. Vinicius Reis": "#301AF8",
+    "Dr. Guilherme Perassa Gasque": "#F14906"
+
 }
 
 
