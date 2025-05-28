@@ -18,7 +18,7 @@
         <h2>Status: {{ status.replace('_', ' ')|capitalize }}</h2>
 
         <div class="menu">
-            <a href="/">+ Novo Recado</a>
+            <a href="{{ url_for('cadastro_recado') }}">+ Novo Recado</a>
             <!--<a href="{{ url_for('logout') }}">Sair-->
             <a href="{{ url_for('listar', status='pendente') }}">Ver Pendentes</a>
         </div>
@@ -29,7 +29,7 @@
             
             <a href="{{ url_for('listar', status='imprimir') }}"class="{% if status == 'imprimir' %}ativo imprimir{% endif %}">Imprimir</a>
             
-            <a href="{{ url_for('listar', status='solicitado_ao_medico') }}"class="{% if status == 'solicitado_ao_medico' %}ativosolicitado_ao_medico{% endif %}">Solicitado</a> 
+            <a href="{{ url_for('listar', status='solicitado_ao_medico') }}"class="{% if status == 'solicitado_ao_medico' %}ativo solicitado_ao_medico{% endif %}">Solicitado</a>                                 
              
             <a href="{{ url_for('listar', status='respondido') }}"class="{% if status == 'respondido' %}ativo respondido{% endif %}">Respondido</a>
             
@@ -129,7 +129,13 @@
                         </div>
                         <a href="{{ url_for('imprimir_recado', id=r['id']) }}" target="_blank"class="btn-imprimir"title="Imprimir recado">🖨️</a> 
                     </td>
-                    <td>{{ r['usuario'] }}</td>
+                    <td>
+                        Solicitado por: {{ r['usuario'] }}<br>
+                        {% if r['status'] == 'finalizado' %}
+                            Finalizado por: {{ r['finalizado_por'] or '---' }}
+                        {% endif %}
+                    </td>
+
                 </tr>
                 {% endfor %}
             </tbody>
@@ -138,7 +144,8 @@
         {% endfor %}
 
         <div class="footer-links">
-            <p><a href="{{ url_for('logout') }}">Sair</a></p>
+            <a href="{{ url_for('logout') }}" class="btn-sair">Sair</a>
+
         </div>
 
         <script>

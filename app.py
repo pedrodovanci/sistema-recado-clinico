@@ -63,7 +63,7 @@ def login():
     
     if 'usuario' in session:
         perfil = session.get('perfil')
-        return redirect(url_for('cadastro' if perfil == 'atendente' else 'listar'))
+        return redirect(url_for('inicio' if perfil == 'atendente' else 'listar'))
     
     
     if request.method == 'POST':
@@ -81,7 +81,7 @@ def login():
             session['perfil'] = usuario['perfil']
             flash('Login realizado com sucesso!', 'success')
             if usuario['perfil'] == 'atendente':
-                return redirect(url_for('cadastro'))
+                return redirect(url_for('inicio'))
             else:
                 return redirect(url_for('listar'))
         else:
@@ -135,7 +135,7 @@ def cadastro():
         return redirect(url_for('listar'))
 
 @app.route('/cadastro_recado')
-@login_requerido(['atendente'])
+@login_requerido(['atendente', 'responsavel'])
 def cadastro_recado():
     usuario = session['usuario']
     return render_template('cadastro_recado.html', usuario=usuario)
@@ -194,6 +194,8 @@ def listar():
     recados_por_medico = {}
     for recado in recados:
         medico = recado['medico']
+        print(f"[DEBUG] Médico no banco: '{medico}'")
+
         if medico not in recados_por_medico:
             recados_por_medico[medico] = []
         recados_por_medico[medico].append(recado)
@@ -201,11 +203,27 @@ def listar():
     quantidades_por_medico = {
     medico: len(recados) for medico, recados in recados_por_medico.items()}
 
-    # 🎨 Gerar cores distintas para os médicos
-    cores_base = ['#3498db', '#e67e22', '#1abc9c', '#9b59b6', '#2ecc71', '#e74c3c']
-    cores_por_medico = {}
-    for i, medico in enumerate(recados_por_medico.keys()):
-        cores_por_medico[medico] = cores_base[i % len(cores_base)]
+    # 🎨 Cores fixas por médico
+    cores_por_medico = {
+    "Dr. Andre Salotto Rocha": "#3498db",
+    "Dr. Fabiano Morais Nogueira": "#1abc9c",
+    "Dr. Mario Jose Goes": "#3fdf0e",
+    "Dr. Dionei Freitas de Morais": "#e67e22",
+    "Dr. Felipe Oliveira Rodrigues": "#f546dd",
+    "Dra. Raysa Moreira Aprigio": "#8e44ad",
+    "Dr. Eduardo Carlos da Silva": "#e74c3c",
+    "Dr. Lucas Crociati Meguins": "#16a085",
+    "Dr. Sergio Luiz Ramin": "#f39c12",
+    "Dr. Carlos Rocha": "#2c3e50",
+    "Dr. Luis Fernando": "#141414",
+    "Dr. Linoel Curado Valsechi": "#c0392b",
+    "Dr. Ricardo Lourenço Caramanti": "#2980b9",
+    "Dr. Alexandre Laranjeira Junior": "#27ae60",
+    "Dr. Caique Alberto Dosualdo": "#d35400",
+    "Dr. Demosthenes Santana": "#34495e",
+    "Dr. Matheus Laurenti": "#0ef8c9"
+}
+
 
     return render_template(
         'listar.html',
@@ -276,7 +294,13 @@ def atualizar_status(id, novo_status):
 
     conexao = conectar_banco()
     cursor = conexao.cursor()
-    cursor.execute('UPDATE recados SET status = ? WHERE id = ?', (novo_status, id))
+
+    if novo_status == 'finalizado':
+        finalizador = session['usuario']
+        cursor.execute('UPDATE recados SET status = ?, finalizado_por = ? WHERE id = ?', (novo_status, finalizador, id))
+    else:
+        cursor.execute('UPDATE recados SET status = ? WHERE id = ?', (novo_status, id))
+
     conexao.commit()
     conexao.close()
 
@@ -290,11 +314,11 @@ def atualizar_status(id, novo_status):
         elif '/entregar' in parsed.path:
             return redirect(url_for('entregar_recado'))
 
-    # fallback padrão por segurança
     if session['perfil'] == 'responsavel':
         return redirect(url_for('listar', status='pendente'))
     else:
         return redirect(url_for('inicio'))
+
 
 
 # 🖨️ Imprimir todos os recados de um determinado status
@@ -358,7 +382,7 @@ def salvar():
         print("❌ Erro ao inserir no banco:", e)
 
     conexao.close()
-    return redirect(url_for('cadastro'))
+    return redirect(url_for('inicio'))
 
 #filtro de formatacao de data
 @app.template_filter('format_data')

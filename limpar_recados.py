@@ -9,7 +9,7 @@ def excluir_recados_antigos():
     conexao.row_factory = sqlite3.Row
     cursor = conexao.cursor()
 
-    limite_data = (datetime.now() - timedelta(days=90)).strftime('%Y-%m-%d %H:%M:%S')
+    limite_data = (datetime.now()- timedelta(days=90)).strftime('%Y-%m-%d %H:%M:%S')
     print(f"[INFO] Excluindo recados 'finalizado' com data anterior a {limite_data}")
 
     cursor.execute('''
