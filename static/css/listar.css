@@ -479,5 +479,14 @@ td .mensagem-preview {
 .btn-sair:hover {
   background-color: #032b4b;
 }
-
-
+.badge-contador {
+    background-color: rgba(255, 255, 255, 0.95);
+    color: #333;
+    padding: 2px 8px;
+    margin-top: 5px;
+    border-radius: 12px;
+    font-size: 13px;
+    font-weight: bold;
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.2);
+    display: inline-block;
+}

@@ -170,7 +170,6 @@ def entregar_recado():
 @login_requerido(['responsavel'])
 def listar():
     status = request.args.get('status', 'pendente')    
-
     busca = request.args.get('busca', '').strip()
 
     conexao = conectar_banco()
@@ -186,98 +185,58 @@ def listar():
             'SELECT * FROM recados WHERE status = ? ORDER BY medico, data_cadastro',
             (status,)
         )
-  
 
     recados = cursor.fetchall()
-    conexao.close()
-    # 🔥 Organizando os recados por médico
+
+    
+    # Contar todos os recados do banco agrupados por status
+    cursor.execute('SELECT status, COUNT(*) as total FROM recados GROUP BY status')
+    contagem_por_status = {row['status']: row['total'] for row in cursor.fetchall()}
+
+
+    # 🔥 Organizar por médico
     recados_por_medico = {}
     for recado in recados:
         medico = recado['medico']
-        
-
         if medico not in recados_por_medico:
             recados_por_medico[medico] = []
         recados_por_medico[medico].append(recado)
 
     quantidades_por_medico = {
-    medico: len(recados) for medico, recados in recados_por_medico.items()}
+        medico: len(recados) for medico, recados in recados_por_medico.items()
+    }
 
-    # 🎨 Cores fixas por médico
+    # 🎨 Cores por médico
     cores_por_medico = {
-    "Dr. Andre Salotto Rocha": "#3498db",
-    "Dr. Fabiano Morais Nogueira": "#1abc9c",
-    "Dr. Mario Jose Goes": "#3fdf0e",
-    "Dr. Dionei Freitas de Morais": "#e67e22",
-    "Dr. Felipe Oliveira Rodrigues": "#f546dd",
-    "Dra. Raysa Moreira Aprigio": "#8e44ad",
-    "Dr. Eduardo Carlos da Silva": "#e74c3c",
-    "Dr. Lucas Crociati Meguins": "#16a085",
-    "Dr. Sergio Luiz Ramin": "#f39c12",
-    "Dr. Carlos Rocha": "#2c3e50",
-    "Dr. Luis Fernando": "#141414",
-    "Dr. Linoel Curado Valsechi": "#c0392b",
-    "Dr. Ricardo Lourenço Caramanti": "#2980b9",
-    "Dr. Alexandre Laranjeira Junior": "#27ae60",
-    "Dr. Caique Alberto Dosualdo": "#d35400",
-    "Dr. Demosthenes Santana": "#34495e",
-    "Dr. Matheus Laurenti": "#0ef8c9",
-    "Dr. Sebastiao Silva": "#014217",
-    "Dr. Vinicius Reis": "#301AF8",
-    "Dr. Guilherme Perassa Gasque": "#F14906"
+        "Dr. Andre Salotto Rocha": "#3498db",
+        "Dr. Fabiano Morais Nogueira": "#1abc9c",
+        "Dr. Mario Jose Goes": "#3fdf0e",
+        "Dr. Dionei Freitas de Morais": "#e67e22",
+        "Dr. Felipe Oliveira Rodrigues": "#f546dd",
+        "Dra. Raysa Moreira Aprigio": "#8e44ad",
+        "Dr. Eduardo Carlos da Silva": "#e74c3c",
+        "Dr. Lucas Crociati Meguins": "#16a085",
+        "Dr. Sergio Luiz Ramin": "#f39c12",
+        "Dr. Carlos Rocha": "#2c3e50",
+        "Dr. Luis Fernando": "#141414",
+        "Dr. Linoel Curado Valsechi": "#c0392b",
+        "Dr. Ricardo Lourenço Caramanti": "#2980b9",
+        "Dr. Alexandre Laranjeira Junior": "#27ae60",
+        "Dr. Caique Alberto Dosualdo": "#d35400",
+        "Dr. Demosthenes Santana": "#34495e",
+        "Dr. Matheus Laurenti": "#0ef8c9"
+    }
 
-}
-
+    conexao.close()
 
     return render_template(
         'listar.html',
         recados_por_medico=recados_por_medico,
         status=status,
         cores=cores_por_medico,
-        quantidades_por_medico=quantidades_por_medico
+        quantidades_por_medico=quantidades_por_medico,
+        contagem_por_status=contagem_por_status
     )
-
-
-    
-# ❌ Exclusão individual de recado
-@app.route('/recado/<int:id>/excluir', methods=['POST'])
-@login_requerido(['responsavel'])
-def excluir_recado(id):
-    conn = conectar_banco()
-    conn.execute('DELETE FROM recados WHERE id = ?', (id,))
-    conn.commit()
-    conn.close()
-    return redirect(url_for('listar'))
-
-# 🛠 Edição de um recado específico
-@app.route('/recado/<int:id>/editar', methods=['GET', 'POST'])
-@login_requerido(['responsavel'])
-def editar_recado(id):
-    conn = conectar_banco()
-    cursor = conn.cursor()
-    
-    recado = conn.execute('SELECT * FROM recados WHERE id = ?', (id,)).fetchone()
-    medicos = cursor.execute('SELECT DISTINCT medico FROM recados').fetchall()
-
-    if request.method == 'POST':
-        medico = request.form['medico']
-        nome_paciente = request.form['nome_paciente']
-        telefone = request.form['telefone']
-        status = request.form['status']
-        prioridade = request.form['prioridade']
-        descricao = request.form['mensagem']
-
-        conn.execute('''
-            UPDATE recados
-            SET medico = ?, nome_paciente = ?, telefone = ?, status = ?, prioridade = ?, descricao = ?
-            WHERE id = ?
-        ''', (medico, nome_paciente, telefone, status, prioridade, descricao, id))
-        conn.commit()
-        conn.close()
-        return redirect(url_for('detalhar_recado', id=id))
-
-    conn.close()
-    return render_template('editar_recado.html', recado=recado, medicos=medicos)
 
 # Visualização detalhada de um recado
 @app.route('/recado/<int:id>')
@@ -308,7 +267,7 @@ def atualizar_status(id, novo_status):
     conexao.commit()
     conexao.close()
 
-    flash('Recado marcado como entregue com sucesso!', 'success')
+    flash(f'Recado atualizado para o status "{novo_status.replace("_", " ")}" com sucesso!', 'success')
 
     ref = request.referrer
     if ref:

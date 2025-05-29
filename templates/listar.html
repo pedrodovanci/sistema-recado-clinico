@@ -30,21 +30,46 @@
 
         <div class="status-filtro">
             <strong>Filtrar por Status:</strong><br />
-            <a href="{{ url_for('listar', status='pendente') }}"class="{% if status == 'pendente' %}ativo pendente{% endif %}">Pendente</a>
-            
-            <a href="{{ url_for('listar', status='imprimir') }}"class="{% if status == 'imprimir' %}ativo imprimir{% endif %}">Imprimir</a>
-            
-            <a href="{{ url_for('listar', status='solicitado_ao_medico') }}"class="{% if status == 'solicitado_ao_medico' %}ativo solicitado_ao_medico{% endif %}">Solicitado</a>                                 
-             
-            <a href="{{ url_for('listar', status='respondido') }}"class="{% if status == 'respondido' %}ativo respondido{% endif %}">Respondido</a>
-            
-            <a href="{{ url_for('listar', status='passar_cartao') }}"class="{% if status == 'passar_cartao' %}ativo passar_cartao{% endif %}">Passar Cartão</a>
-            
-            <a href="{{ url_for('listar', status='so_entregar') }}"class="{% if status == 'so_entregar' %}ativo so_entregar{% endif %}" >Só Entregar</a>
-            
-            <a href="{{ url_for('listar', status='alto_custo') }}"class="{% if status == 'alto_custo' %}ativo alto_custo{% endif %}" >Alto Custo</a>
+            <a href="{{ url_for('listar', status='pendente') }}" class="{% if status == 'pendente' %}ativo pendente{% endif %}">
+                Pendente
+                <div class="badge-contador">{{ contagem_por_status.get('pendente', 0) }}</div>
+            </a>
 
-            <a href="{{ url_for('listar', status='entregue') }}" class="{% if status == 'entregue' %}ativo entregue{% endif %}">Entregues</a>
+            <a href="{{ url_for('listar', status='imprimir') }}" class="{% if status == 'imprimir' %}ativo imprimir{% endif %}">
+                Imprimir
+                <div class="badge-contador">{{ contagem_por_status.get('imprimir', 0) }}</div>
+            </a>
+
+            <a href="{{ url_for('listar', status='solicitado_ao_medico') }}" class="{% if status == 'solicitado_ao_medico' %}ativo solicitado_ao_medico{% endif %}">
+                Solicitado
+                <div class="badge-contador">{{ contagem_por_status.get('solicitado_ao_medico', 0) }}</div>
+            </a>
+
+            <a href="{{ url_for('listar', status='respondido') }}" class="{% if status == 'respondido' %}ativo respondido{% endif %}">
+                Respondido
+                <div class="badge-contador">{{ contagem_por_status.get('respondido', 0) }}</div>
+            </a>
+
+            <a href="{{ url_for('listar', status='passar_cartao') }}" class="{% if status == 'passar_cartao' %}ativo passar_cartao{% endif %}">
+                Passar Cartão
+                <div class="badge-contador">{{ contagem_por_status.get('passar_cartao', 0) }}</div>
+            </a>
+
+            <a href="{{ url_for('listar', status='so_entregar') }}" class="{% if status == 'so_entregar' %}ativo so_entregar{% endif %}">
+                Só Entregar
+                <div class="badge-contador">{{ contagem_por_status.get('so_entregar', 0) }}</div>
+            </a>
+
+            <a href="{{ url_for('listar', status='alto_custo') }}" class="{% if status == 'alto_custo' %}ativo alto_custo{% endif %}">
+                Alto Custo
+                <div class="badge-contador">{{ contagem_por_status.get('alto_custo', 0) }}</div>
+            </a>
+
+            <a href="{{ url_for('listar', status='finalizado') }}" class="{% if status == 'finalizado' %}ativo finalizado{% endif %}">
+                Entregues
+                <div class="badge-contador">{{ contagem_por_status.get('finalizado', 0) }}</div>
+            </a>
+
         </div>   
 
         <div class="imprimir-bloco">
