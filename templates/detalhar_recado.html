@@ -62,11 +62,7 @@
         <div class="actions">
           <a href="{{ url_for('listar') }}">Voltar</a>
           <a href="{{ url_for('editar_recado', id=recado.id) }}">Editar</a>
-          <form
-            action="{{ url_for('excluir_recado', id=recado.id) }}"
-            method="POST"
-            style="display: inline"
-          >
+          <form action="{{ url_for('excluir_recado', id=recado.id) }}" method="POST" style="display: inline">
             <button class="delete-btn" type="submit">Excluir</button>
           </form>
         </div>
