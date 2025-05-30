@@ -65,7 +65,11 @@
                 <div class="badge-contador">{{ contagem_por_status.get('alto_custo', 0) }}</div>
             </a>
 
+<<<<<<< HEAD
             <a href="{{ url_for('listar', status='entregue') }}" class="{% if status == 'finalizado' %}ativo finalizado{% endif %}">
+=======
+            <a href="{{ url_for('listar', status='entregue') }}" class="{% if status == 'entregue' %}ativo finalizado{% endif %}">
+>>>>>>> 0b722fa0ec4ab99104337ef9b9cf7be6a7422923
                 Entregues
                 <div class="badge-contador">{{ contagem_por_status.get('entregue', 0) }}</div>
             </a>
