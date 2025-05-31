@@ -117,7 +117,6 @@
         </a>
       </div>
 
-<<<<<<< HEAD
       <div class="imprimir-bloco">
         <strong>Imprimir:</strong><br />
         <a
@@ -149,16 +148,11 @@
         </button>
       </form>
       {% endif %}
-=======
-<<<<<<< HEAD
-            <a href="{{ url_for('listar', status='entregue') }}" class="{% if status == 'finalizado' %}ativo finalizado{% endif %}">
-=======
-            <a href="{{ url_for('listar', status='entregue') }}" class="{% if status == 'entregue' %}ativo finalizado{% endif %}">
->>>>>>> 0b722fa0ec4ab99104337ef9b9cf7be6a7422923
+
+            <a href="{{ url_for('responsavl.listar', status='entregue') }}" class="{% if status == 'finalizado' %}ativo finalizado{% endif %}">
                 Entregues
                 <div class="badge-contador">{{ contagem_por_status.get('entregue', 0) }}</div>
             </a>
->>>>>>> a7289fe33b1724d0f6e5fab067d74a702f9b34c1
 
       <!-- Acordeão -->
       {% for medico, recados_medico in recados_por_medico.items() %}
