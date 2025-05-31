@@ -30,7 +30,7 @@
                 </select>
 
                 <label>Nome do Paciente:</label>
-                <input type="text" name="nome_paciente" value="{{ recado.nome_paciente }}" required>
+                <input type="text" name="nome_paciente" value="{{ recado['nome_paciente'] }}" required>
 
                 <label>Telefone:</label>
                 <input type="text" name="telefone" value="{{ recado.telefone }}" required>
@@ -51,9 +51,9 @@
 
 
                 <label>Mensagem:</label>
-                <textarea name="mensagem" style="text-align:left; padding:10px; line-height:1.5; white-space:pre-wrap;">{{ recado.descricao }}</textarea>
+                <textarea name="mensagem" style="text-align:left; padding:10px; line-height:1.5; white-space:pre-wrap;">{{ recado['descricao'] }}</textarea>
                 <button type="submit">Salvar Alterações</button>
-                <a href="{{ url_for('detalhar_recado', id=recado.id) }}">Cancelar</a>
+                <a href="{{ url_for('responsavel.detalhar_recado', id=recado.id) }}">Cancelar</a>
             </form>
          </div>   
     </div>   

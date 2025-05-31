@@ -54,16 +54,16 @@
                 overflow-y: auto;
               "
             >
-              {{ recado.descricao }}
+              {{ recado['descricao'] }}
             </div>
           </div>
         </div>
 
         <div class="actions">
-          <a href="{{ url_for('listar') }}">Voltar</a>
-          <a href="{{ url_for('editar_recado', id=recado.id) }}">Editar</a>
+          <a href="{{ url_for('responsavel.listar') }}">Voltar</a>
+          <a href="{{ url_for('responsavel.editar_recado', id=recado.id) }}">Editar</a>
           <form
-            action="{{ url_for('excluir_recado', id=recado.id) }}"
+            action="{{ url_for('responsavel.excluir_recado', id=recado.id) }}"
             method="POST"
             style="display: inline"
           >

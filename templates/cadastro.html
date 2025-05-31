@@ -12,12 +12,12 @@
     <div class="container">
         <h2>Bem-vindo, {{ usuario }}!</h2>
         <div class="links">
-            <a href="{{ url_for('logout') }}">Sair</a>
-            <a href="/listar">Ir para Listagem</a>
+            <a href="{{ url_for('comuns.logout') }}">Sair</a>
+            <a href="{{ url_for('responsavel.listar') }}">Ir para Listagem</a>
         </div>
 
         <h1>Cadastro de Recados</h1>
-        <form action="/salvar" method="post">
+         <form action="{{ url_for('comuns.salvar') }}" method="post">
             <label>Médico:</label>
             <select name="medico" required>
                 <option value="Dr. Alexandre Laranjeira Junior">Dr. Alexandre Laranjeira Junior</option>
