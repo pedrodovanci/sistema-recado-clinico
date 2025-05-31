@@ -60,6 +60,7 @@
         </div>
 
         <div class="actions">
+<<<<<<< HEAD
           <a href="{{ url_for('responsavel.listar') }}">Voltar</a>
           <a href="{{ url_for('responsavel.editar_recado', id=recado.id) }}">Editar</a>
           <form
@@ -67,6 +68,11 @@
             method="POST"
             style="display: inline"
           >
+=======
+          <a href="{{ url_for('listar') }}">Voltar</a>
+          <a href="{{ url_for('editar_recado', id=recado.id) }}">Editar</a>
+          <form action="{{ url_for('excluir_recado', id=recado.id) }}" method="POST" style="display: inline">
+>>>>>>> a7289fe33b1724d0f6e5fab067d74a702f9b34c1
             <button class="delete-btn" type="submit">Excluir</button>
           </form>
         </div>
