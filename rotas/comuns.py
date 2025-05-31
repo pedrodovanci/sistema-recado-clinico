@@ -9,34 +9,46 @@ def comuns_routes(conectar_banco, login_requerido):
     def login():
         if 'usuario' in session:
             perfil = session.get('perfil')
-            return redirect(url_for('comuns.inicio' if perfil == 'atendente' else 'responsavel.listar'))
+            if perfil == 'atendente':
+                return redirect(url_for('comuns.inicio'))
+            elif perfil == 'responsavel':
+                return redirect(url_for('responsavel.listar'))
+            elif perfil == 'admin':
+                return redirect(url_for('admin.inicio'))
 
         if request.method == 'POST':
             username = request.form['username']
             senha = request.form['senha']
             conexao = conectar_banco()
-            cursor = conexao.cursor()
-            cursor.execute('SELECT * FROM usuarios WHERE username = ? AND senha = ?', (username, senha))
-            usuario = cursor.fetchone()
-            conexao.close()
+            try:
+                cursor = conexao.cursor()
+                cursor.execute('SELECT * FROM usuarios WHERE username = ? AND senha = ?', (username, senha))
+                usuario = cursor.fetchone()
+            finally:
+                conexao.close()
 
             if usuario:
                 session['usuario'] = usuario['username']
                 session['perfil'] = usuario['perfil']
                 flash('Login realizado com sucesso!', 'success')
-                return redirect(url_for('comuns.inicio' if usuario['perfil'] == 'atendente' else 'responsavel.listar'))
+                if usuario['perfil'] == 'atendente':
+                    return redirect(url_for('comuns.inicio'))
+                elif usuario['perfil'] == 'responsavel':
+                    return redirect(url_for('responsavel.listar'))
+                elif usuario['perfil'] == 'admin':
+                    return redirect(url_for('admin.inicio'))
+
             else:
                 flash('Usuário ou senha inválidos!', 'danger')
 
         return render_template('login.html')
-    # Rota para logout (encerra sessão)
+
     @comuns.route('/logout')
     def logout():
         session.clear()
         flash('Logout realizado com sucesso!', 'success')
         return redirect(url_for('comuns.login'))
 
-    # Rota principal que redireciona atendente para dashboard e responsável para listagem
     @comuns.route('/', endpoint='inicio')
     @login_requerido(['atendente', 'responsavel'])
     def inicio():
@@ -46,14 +58,12 @@ def comuns_routes(conectar_banco, login_requerido):
         else:
             return redirect(url_for('responsavel.listar'))
 
-    # Exibe formulário de cadastro de novo recado    
     @comuns.route('/cadastro_recado')
     @login_requerido(['atendente', 'responsavel'])
     def cadastro_recado():
-            usuario = session['usuario']
-            return render_template('cadastro_recado.html', usuario=usuario)
+        usuario = session['usuario']
+        return render_template('cadastro_recado.html', usuario=usuario)
 
-    # Salva novo recado enviado pelo formulário de cadastro
     @comuns.route('/salvar', methods=['POST'])
     @login_requerido(['atendente', 'responsavel'])
     def salvar():
@@ -70,18 +80,19 @@ def comuns_routes(conectar_banco, login_requerido):
         status = 'pendente'
         data_cadastro = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         conexao = conectar_banco()
-        cursor = conexao.cursor()
-        cursor.execute('''
-            INSERT INTO recados 
-            (medico, prioridade, nome_paciente, data_nascimento, telefone, convenio, descricao, status, usuario, data_cadastro)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', dados + (status, usuario, data_cadastro))
-        conexao.commit()
-        conexao.close()
+        try:
+            cursor = conexao.cursor()
+            cursor.execute('''
+                INSERT INTO recados 
+                (medico, prioridade, nome_paciente, data_nascimento, telefone, convenio, descricao, status, usuario, data_cadastro)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)''', dados + (status, usuario, data_cadastro))
+            conexao.commit()
+        finally:
+            conexao.close()
+
         flash("Recado cadastrado com sucesso!", "success")
-            
         return redirect(url_for('comuns.inicio'))
 
-    # Permite busca de recados para entrega e finalização por nome
     @comuns.route('/entregar', methods=['GET', 'POST'])
     @login_requerido(['atendente', 'responsavel'])
     def entregar_recado():
@@ -91,14 +102,16 @@ def comuns_routes(conectar_banco, login_requerido):
             busca = request.form['busca'].strip()
         if busca:
             conexao = conectar_banco()
-            cursor = conexao.cursor()
-            cursor.execute('SELECT * FROM recados WHERE nome_paciente LIKE ?', (f'%{busca}%',))
-            recados = cursor.fetchall()
-            conexao.close()
+            try:
+                cursor = conexao.cursor()
+                cursor.execute('SELECT * FROM recados WHERE nome_paciente LIKE ?', (f'%{busca}%',))
+                recados = cursor.fetchall()
+            finally:
+                conexao.close()
 
             for recado in recados:
                 status = recado['status']
-                medico = recado['medico']  # <- agora sempre definido
+                medico = recado['medico']
 
                 if status not in resultados:
                     resultados[status] = {}
@@ -108,28 +121,26 @@ def comuns_routes(conectar_banco, login_requerido):
 
                 resultados[status][medico].append(recado)
 
-
         return render_template('entregar_recado.html', resultados=resultados, busca=busca)
-    
-    # Atualizar status de um recado
+
     @comuns.route('/atualizar_status/<int:id>/<string:novo_status>')
     def atualizar_status(id, novo_status):
         if 'usuario' not in session or session.get('perfil') not in ['responsavel', 'atendente']:
             return redirect(url_for('comuns.login'))
 
         conexao = conectar_banco()
-        cursor = conexao.cursor()
-
-        if novo_status == 'entregue':
-            finalizador = session['usuario']
-            cursor.execute('UPDATE recados SET status = ?, finalizado_por = ? WHERE id = ?', (novo_status, finalizador, id))
-        else:
-            cursor.execute('UPDATE recados SET status = ? WHERE id = ?', (novo_status, id))
-
+        try:
+            cursor = conexao.cursor()
+            if novo_status == 'entregue':
+                finalizador = session['usuario']
+                cursor.execute('UPDATE recados SET status = ?, finalizado_por = ? WHERE id = ?', (novo_status, finalizador, id))
+            else:
+                cursor.execute('UPDATE recados SET status = ? WHERE id = ?', (novo_status, id))
             conexao.commit()
+        finally:
             conexao.close()
 
-            flash(f'Recado atualizado para o status "{novo_status}" com sucesso!', 'success')
+        flash(f'Recado atualizado para o status "{novo_status}" com sucesso!', 'success')
 
         ref = request.referrer
         if ref:

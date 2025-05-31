@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Detalhes do Recado</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/detalhar.css') }}">
+
+  </head>
+  <body class="fundo">
+    <div class="imagem_fundo">
+      <div class="container">
+        <h1>Detalhes do Recado</h1>
+        <div class="info">
+          <div class="campo">
+            <label>Médico:</label>
+            <p><strong>{{ recado['medico'] }}</strong></p>
+          </div>
+          <div class="campo">
+            <label>Paciente:</label>
+            <p><strong>{{ recado['nome_paciente'] }}</strong></p>
+          </div>
+          <div class="campo">
+            <label>Telefone:</label>
+            <p><strong>{{ recado['telefone'] }}</strong></p>
+          </div>
+          <div class="campo"><p><strong>Data de Cadastro:</strong> <strong>{{ recado['data_cadastro']|format_data }}</strong></p></div>
+
+          <div class="campo">
+            <label>Status:</label>
+            <p><strong>{{ recado['status'] }}</strong></p>
+          </div>
+          <div class="campo">
+            <label>Solicitado por:</label></strong> 
+            <p><strong>{{ recado['usuario'] }}</strong></p>
+
+         </div>
+          <div class="campo">
+            <label>Prioridade:</label>
+           <p><strong>{{ recado['prioridade'] }}</strong></p>
+          </div>
+
+          <div class="mensagem-container">
+            <label>Mensagem:</label>
+            <div
+              style="
+                border: 1px solid #ccc;
+                padding: 10px;
+                border-radius: 6px;
+                background-color: #f9f9f9;
+                white-space: pre-wrap;
+                word-break: break-word;
+                max-height: 100px;
+                overflow-y: auto;
+              "
+            >
+              {{ recado['descricao'] }}
+            </div>
+          </div>
+        </div>
+
+        <div class="actions">
+          <a href="{{ url_for('responsavel.listar') }}">Voltar</a>
+          <a href="{{ url_for('responsavel.editar_recado', id=recado.id) }}">Editar</a>
+          <form
+            action="{{ url_for('responsavel.excluir_recado', id=recado.id) }}"
+            method="POST"
+            style="display: inline"
+          >
+            <button class="delete-btn" type="submit">Excluir</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

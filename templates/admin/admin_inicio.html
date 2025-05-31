@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Painel do Administrador</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}">
+</head>
+<body>
+    <div class="container">
+        <h1>Painel do Administrador</h1>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="flash {{ category }}">{{ message }}</li>
+                {% endfor %}
+                </ul>
+            {% endif %}
+        {% endwith %}
+
+        <p>Bem-vindo, {{ usuario }}!</p>
+
+        <div class="menu">
+            <a href="{{ url_for('admin.novo_usuario') }}">Criar Novo Usuário</a>
+            <a href="{{ url_for('admin.listar_usuarios') }}">Gerenciar Usuários</a>
+          <!-- <a href="{{ url_for('responsavel.listar') }}">Visualizar Recados</a>-->
+            <a href="{{ url_for('comuns.logout') }}">Sair</a>
+        </div>
+    </div>
+    <script>
+        setTimeout(function () {
+            const flash = document.querySelector('.flashes');
+            if (flash) {
+                flash.style.display = 'none';
+            }
+        }, 2000); // 2 segundos
+    </script>
+</body>
+</html>

@@ -149,10 +149,6 @@
       </form>
       {% endif %}
 
-            <a href="{{ url_for('responsavl.listar', status='entregue') }}" class="{% if status == 'finalizado' %}ativo finalizado{% endif %}">
-                Entregues
-                <div class="badge-contador">{{ contagem_por_status.get('entregue', 0) }}</div>
-            </a>
 
       <!-- Acordeão -->
       {% for medico, recados_medico in recados_por_medico.items() %}

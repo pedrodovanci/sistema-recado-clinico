@@ -1,0 +1,314 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Listagem de Recados</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/listar.css') }}"
+    />
+  </head>
+  <body class="fundo">
+    <form action="{{ url_for('responsavel.listar') }}" method="get" class="campo-busca">
+      <input
+        type="text"
+        name="busca"
+        placeholder="Buscar paciente..."
+        value="{{ request.args.get('busca', '') }}"
+      />
+      <input type="hidden" name="status" value="{{ status }}" />
+      <button type="submit">🔍</button>
+    </form>
+
+    <div class="container">
+      <h1>Recados</h1>
+      <h2>
+        Status: {% if status == 'entregue' %}Entregue {% else %}{{
+        status.replace('_', ' ')|capitalize }} {% endif %}
+      </h2>
+
+      <div class="menu">
+        <a href="{{ url_for('comuns.cadastro_recado') }}">+ Novo Recado</a>
+        <a href="{{ url_for('comuns.entregar_recado') }}">Entregar Recado</a>
+        <a href="{{ url_for('responsavel.listar', status='pendente') }}">Ver Pendentes</a>
+      </div>
+
+      <div class="status-filtro">
+        <strong>Filtrar por Status:</strong><br />
+        <a
+          href="{{ url_for('responsavel.listar', status='pendente') }}"
+          class="{% if status == 'pendente' %}ativo pendente{% endif %}"
+        >
+          Pendente
+          <div class="badge-contador">
+            {{ contagem_por_status.get('pendente', 0) }}
+          </div>
+        </a>
+
+        <a
+          href="{{ url_for('responsavel.listar', status='imprimir') }}"
+          class="{% if status == 'imprimir' %}ativo imprimir{% endif %}"
+        >
+          Imprimir
+          <div class="badge-contador">
+            {{ contagem_por_status.get('imprimir', 0) }}
+          </div>
+        </a>
+
+        <a
+          href="{{ url_for('responsavel.listar', status='solicitado_ao_medico') }}"
+          class="{% if status == 'solicitado_ao_medico' %}ativo solicitado_ao_medico{% endif %}"
+        >
+          Solicitado
+          <div class="badge-contador">
+            {{ contagem_por_status.get('solicitado_ao_medico', 0) }}
+          </div>
+        </a>
+
+        <a
+          href="{{ url_for('responsavel.listar', status='respondido') }}"
+          class="{% if status == 'respondido' %}ativo respondido{% endif %}"
+        >
+          Respondido
+          <div class="badge-contador">
+            {{ contagem_por_status.get('respondido', 0) }}
+          </div>
+        </a>
+
+        <a
+          href="{{ url_for('responsavel.listar', status='passar_cartao') }}"
+          class="{% if status == 'passar_cartao' %}ativo passar_cartao{% endif %}"
+        >
+          Passar Cartão
+          <div class="badge-contador">
+            {{ contagem_por_status.get('passar_cartao', 0) }}
+          </div>
+        </a>
+
+        <a
+          href="{{ url_for('responsavel.listar', status='so_entregar') }}"
+          class="{% if status == 'so_entregar' %}ativo so_entregar{% endif %}"
+        >
+          Só Entregar
+          <div class="badge-contador">
+            {{ contagem_por_status.get('so_entregar', 0) }}
+          </div>
+        </a>
+
+        <a
+          href="{{ url_for('responsavel.listar', status='alto_custo') }}"
+          class="{% if status == 'alto_custo' %}ativo alto_custo{% endif %}"
+        >
+          Alto Custo
+          <div class="badge-contador">
+            {{ contagem_por_status.get('alto_custo', 0) }}
+          </div>
+        </a>
+
+        <a
+          href="{{ url_for('responsavel.listar', status='entregue') }}"
+          class="{% if status == 'entregue' %}ativo finalizado{% endif %}"
+        >
+          Entregues
+          <div class="badge-contador">
+            {{ contagem_por_status.get('entregue', 0) }}
+          </div>
+        </a>
+      </div>
+
+      <div class="imprimir-bloco">
+        <strong>Imprimir:</strong><br />
+        <a
+          href="{{ url_for('responsavel.imprimir', status=status) }}"
+          target="_blank"
+          class="btn-imprimir-status {{ status }}"
+          >Todos deste status</a
+        >
+      </div>
+      {% if status == 'entregue' %}
+      <form
+        action="{{ url_for('responsavel.excluir_todos', status=status) }}"
+        method="post"
+        onsubmit="return confirm('Tem certeza que deseja excluir TODOS os recados ENTREGUES?');"
+      >
+        <button
+          type="submit"
+          style="
+            margin: 10px 0;
+            background-color: #e74c3c;
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+          "
+        >
+          Excluir todos os recados
+        </button>
+      </form>
+      {% endif %}
+
+
+      <!-- Acordeão -->
+      {% for medico, recados_medico in recados_por_medico.items() %}
+      <button
+        class="accordion"
+        style="background-color: {{ cores.get(medico, '#3498db') }}"
+      >
+        {{ medico }}
+        <span class="badge-contador">{{ quantidades_por_medico[medico] }}</span>
+      </button>
+
+      <div class="panel">
+        <table>
+          <thead>
+            <tr>
+              <th>Prioridade</th>
+              <th>Paciente</th>
+              <th>Telefone</th>
+              <th class="coluna-data">Data</th>
+              <th>Mensagem</th>
+              <th>Status</th>
+              <th>Ações</th>
+              <th>Solicitado por:</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for r in recados_medico %}
+            <tr>
+              <td><span class="prioridade">{{ r['prioridade'] }}</span></td>
+
+              <td>
+                <a
+                  href="{{ url_for('responsavel.detalhar_recado', id=r['id']) }}"
+                  class="btn-paciente"
+                  title="{{ r['nome_paciente'] }}"
+                >
+                  {{ r['nome_paciente'] }}
+                </a>
+              </td>
+
+              <td>{{ r['telefone'] }}</td>
+              <td>{{ r['data_cadastro']|format_data }}</td>
+
+              <td>
+                <span class="mensagem-preview">{{ r['descricao'] }}</span>
+              </td>
+
+              <td>
+                <span class="status {{ r['status']|replace(' ', '_') }}">
+                  {% if r['status'] == 'entregue' %} Entregue {% else %} {{
+                  r['status'].replace('_', ' ') }} {% endif %}
+                </span>
+              </td>
+              <td>
+                <div class="dropdown">
+                  <button class="dropbtn">Alterar Status</button>
+
+                  <div class="dropdown-content">
+                    <a
+                      href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='pendente') }}"
+                      >Pendente</a
+                    >
+
+                    <a
+                      href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='imprimir') }}"
+                      >Imprimir</a
+                    >
+
+                    <a
+                      href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='solicitado_ao_medico') }}"
+                      >Solicitado</a
+                    >
+
+                    <a
+                      href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='respondido') }}"
+                      >Respondido</a
+                    >
+
+                    <a
+                      href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='passar_cartao') }}"
+                      >Passar Cartão</a
+                    >
+
+                    <a
+                      href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='so_entregar') }}"
+                      >Só Entregar</a
+                    >
+
+                    <a
+                      href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='alto_custo') }}"
+                      >Alto Custo</a
+                    >
+
+                    <a
+                      href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='entregue') }}"
+                      >Entregue</a
+                    >
+                  </div>
+                </div>
+                <a
+                  href="{{ url_for('responsavel.imprimir_recado', id=r['id']) }}"
+                  target="_blank"
+                  class="btn-imprimir"
+                  title="Imprimir recado"
+                  >🖨️</a
+                >
+              </td>
+              <td>
+                Solicitado por: {{ r['usuario'] }}<br />
+                {% if r['status'] == 'entregue' %} Entregue por: {{
+                r['finalizado_por'] or '---' }} {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% endfor %}
+
+      <div class="footer-links">
+        <a href="{{ url_for('comuns.logout') }}" class="btn-sair">Sair</a>
+      </div>
+
+      <script>
+        const acc = document.getElementsByClassName("accordion");
+        for (let i = 0; i < acc.length; i++) {
+          acc[i].addEventListener("click", function () {
+            this.classList.toggle("active");
+            const panel = this.nextElementSibling;
+            if (panel.style.display === "block") {
+              panel.style.display = "none";
+            } else {
+              panel.style.display = "block";
+            }
+          });
+        }
+      </script>
+    </div>
+    {% with mensagens = get_flashed_messages(with_categories=true) %} {% if
+    mensagens %}
+    <div class="toast-container">
+      {% for categoria, msg in mensagens %}
+      <div class="toast {{ categoria }}">✅ {{ msg.replace('_', ' ') }}</div>
+      {% endfor %}
+    </div>
+    {% endif %} {% endwith %}
+    <script>
+      window.addEventListener("load", function () {
+        const toasts = document.querySelectorAll(".toast");
+        toasts.forEach((toast) => {
+          setTimeout(() => {
+            toast.style.transition = "opacity 1s ease";
+            toast.style.opacity = "0";
+
+            setTimeout(() => {
+              toast.remove();
+            }, 1000); // após o fade-out
+          }, 5000); // visível por 5 segundos
+        });
+      });
+    </script>
+  </body>
+</html>
