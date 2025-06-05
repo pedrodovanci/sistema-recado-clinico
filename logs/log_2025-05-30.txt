@@ -1,0 +1,2 @@
+[23:25:52] 🔍 Verificando recados entregues antes de 2025-03-01 23:25:52
+[23:25:52] ✅ 0 recado(s) excluído(s).

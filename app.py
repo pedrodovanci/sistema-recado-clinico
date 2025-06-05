@@ -2,7 +2,7 @@ from flask import Flask, session
 from datetime import datetime
 import sqlite3
 
-from rotas import comuns_routes, responsavel_routes
+from rotas import comuns_routes, responsavel_routes, admin_routes
 
 app = Flask(__name__)
 app.secret_key = 'chave-secreta'
@@ -71,6 +71,7 @@ def formatar_data_br(data_str):
 # Registrar os blueprints
 app.register_blueprint(comuns_routes(conectar_banco, login_requerido))
 app.register_blueprint(responsavel_routes(conectar_banco, login_requerido))
+app.register_blueprint(admin_routes(conectar_banco, login_requerido))  
 
 @app.errorhandler(404)
 def pagina_nao_encontrada(e):

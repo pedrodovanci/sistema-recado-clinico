@@ -53,7 +53,10 @@ def responsavel_routes(conectar_banco, login_requerido):
             "Dr. Alexandre Laranjeira Junior": "#27ae60",
             "Dr. Caique Alberto Dosualdo": "#d35400",
             "Dr. Demosthenes Santana": "#34495e",
-            "Dr. Matheus Laurenti": "#0ef8c9"
+            "Dr. Matheus Laurenti": "#0ef8c9",
+            "Dr. Vinicius Reis": "#0A0124",
+            "Dr. Sebastiao Silva":"#410000",
+            "Dr. Guilherme Perassa Gasque":"#022400"
         }
 
         conexao.close()
@@ -146,20 +149,36 @@ def responsavel_routes(conectar_banco, login_requerido):
     @login_requerido(['responsavel'])
     def imprimir(status):
         conexao = conectar_banco()
-        cursor = conexao.cursor()
-        cursor.execute('SELECT * FROM recados WHERE status = ? ORDER BY medico, prioridade', (status,))
-        recados = cursor.fetchall()
-        conexao.close()
+        try:
+            cursor = conexao.cursor()
+            cursor.execute('SELECT * FROM recados WHERE status = ? ORDER BY medico, prioridade', (status,))
+            rows = cursor.fetchall()
+        finally:
+            conexao.close()
+
+        recados = []
+        for row in rows:
+            recado = dict(row)
+            try:
+                nascimento = datetime.strptime(recado['data_nascimento'], '%Y-%m-%d')
+                recado['data_nascimento_formatada'] = nascimento.strftime('%d/%m/%Y')
+            except:
+                recado['data_nascimento_formatada'] = recado['data_nascimento']
+            recados.append(recado)
+
         return render_template('imprimir_lista.html', recados=recados)
+
 
     @responsavel_bp.route('/excluir_todos/<status>', methods=['POST'])
     @login_requerido(['responsavel'])
     def excluir_todos(status):
         conexao = conectar_banco()
-        cursor = conexao.cursor()
-        cursor.execute('DELETE FROM recados WHERE status = ?', (status,))
-        conexao.commit()
-        conexao.close()
+        try:
+            cursor = conexao.cursor()
+            cursor.execute('DELETE FROM recados WHERE status = ?', (status,))
+            conexao.commit()
+        finally:
+            conexao.close()
         flash(f'Todos os recados com status "{status}" foram excluídos.', 'success')
         return redirect(url_for('responsavel.listar', status=status))
 

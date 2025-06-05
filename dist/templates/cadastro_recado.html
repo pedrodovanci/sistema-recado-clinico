@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Cadastro de Recado</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h2>Bem-vindo, {{ usuario }}!</h2>
+        <div class="links">
+            <a href="{{ url_for('comuns.logout') }}">Sair</a>
+            <a href="{{ url_for('responsavel.listar') }}">Ir para Listagem</a>
+        </div>
+
+        <h1>Cadastro de Recados</h1>
+        <form action="{{ url_for('comuns.salvar') }}" method="post">
+            <label>Médico:</label>
+            <select name="medico" required>
+                <option value="Dr. Alexandre Laranjeira Junior">Dr. Alexandre Laranjeira Junior</option>
+                <option value="Dr. Andre Salotto Rocha">Dr. Andre Salotto Rocha</option>
+                <option value="Dr. Caique Alberto Dosualdo">Dr. Caique Alberto Dosualdo</option>
+                <option value="Dr. Carlos Rocha">Dr. Carlos Rocha</option>
+                <option value="Dr. Demosthenes Santana">Dr. Demosthenes Santana</option>
+                <option value="Dr. Dionei Freitas de Morais">Dr. Dionei Freitas de Morais</option>
+                <option value="Dr. Eduardo Carlos da Silva">Dr. Eduardo Carlos da Silva</option>
+                <option value="Dr. Fabiano Morais Nogueira">Dr. Fabiano Morais Nogueira</option>
+                <option value="Dr. Felipe Oliveira Rodrigues">Dr. Felipe Oliveira Rodrigues</option> 
+                <option value="Dr. Guilherme Perassa Gasque">Dr. Guilherme Perassa Gasque</option>
+                <option value="Dr. Linoel Curado Valsechi">Dr. Linoel Curado Valsechi</option>
+                <option value="Dr. Lucas Crociati Meguins">Dr. Lucas Crociati Meguins</option>
+                <option value="Dr. Luis Fernando">Dr. Luis Fernando</option>
+                <option value="Dr. Mario Jose Goes">Dr. Mario Jose Goes</option>
+                <option value="Dr. Matheus Laurenti">Dr. Matheus Laurenti</option>
+                <option value="Dra. Raysa Moreira Aprigio">Dra. Raysa Moreira Aprigio</option>
+                <option value="Dr. Ricardo Lourenço Caramanti">Dr. Ricardo Lourenço Caramanti</option>
+                <option value="Dr. Sebastiao Silva">Dr. Sebastiao Silva</option>
+                <option value="Dr. Sergio Luiz Ramin">Dr. Sergio Luiz Ramin</option>
+                <option value="Dr. Vinicius Reis">Dr. Vinicius Reis</option>
+
+            </select>
+
+            <label>Prioridade:</label>
+            <select name="prioridade" required>
+                <option value="Urgência - até 24 horas">Urgência - até 24 horas</option>
+                <option value="Urgência eletiva - até 3 dias">Urgência eletiva - até 3 dias</option>
+                <option value="Eletiva">Eletiva</option>
+            </select>
+
+            <label>Nome do Paciente:</label>
+            <input type="text" name="nome_paciente" required>
+
+            <label>Data de Nascimento:</label>
+            <input type="date" name="data_nascimento" required>
+
+            <label>Telefone:</label>
+            <input type="text" id="telefone" name="telefone" required>
+
+            <label>Convênio:</label>
+            <input type="text" name="convenio">
+
+            <label>Descrição do Recado:</label>
+            <textarea name="descricao" rows="4" required></textarea>
+
+            <button type="submit">Salvar Recado</button>
+        </form>
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('#telefone').inputmask('(99) 99999-9999');
+        });
+    </script>
+</body>
+</html>
