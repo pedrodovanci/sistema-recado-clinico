@@ -56,7 +56,8 @@ def responsavel_routes(conectar_banco, login_requerido):
             "Dr. Matheus Laurenti": "#0ef8c9",
             "Dr. Vinicius Reis": "#0A0124",
             "Dr. Sebastiao Silva":"#410000",
-            "Dr. Guilherme Perassa Gasque":"#022400"
+            "Dr. Guilherme Perassa Gasque":"#022400",
+            "Dr. Fernando Filipe":"#7A29FD"
         }
 
         conexao.close()
