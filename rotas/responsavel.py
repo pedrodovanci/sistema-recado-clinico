@@ -13,29 +13,61 @@ def responsavel_routes(conectar_banco, login_requerido):
     @login_requerido(['responsavel'])
     def listar():
         status = request.args.get('status', 'pendente')
-        busca = request.args.get('busca', '').strip()
+        busca  = request.args.get('busca', '').strip()
 
         conexao = conectar_banco()
         cursor = conexao.cursor()
 
         if busca:
-            cursor.execute('SELECT * FROM recados WHERE status = ? AND nome_paciente LIKE ? ORDER BY medico, prioridade', (status, f'%{busca}%'))
+            like = f"%{busca}%"
+
+            # 1) Resultados da BUSCA (sem filtrar status)
+            cursor.execute("""
+                SELECT *
+                FROM recados
+                WHERE nome_paciente LIKE ? COLLATE NOCASE
+                ORDER BY medico, data_cadastro DESC
+            """, (like,))
+            recados = cursor.fetchall()
+
+            # 2) Contagem por status (APENAS dentro do resultado da busca)
+            cursor.execute("""
+                SELECT status, COUNT(*) AS total
+                FROM recados
+                WHERE nome_paciente LIKE ? COLLATE NOCASE
+                GROUP BY status
+            """, (like,))
+            contagem_por_status_filtrado = {row['status']: row['total'] for row in cursor.fetchall()}
+
+            # 3) Contagem global (panorama geral — opcional)
+            cursor.execute("SELECT status, COUNT(*) AS total FROM recados GROUP BY status")
+            contagem_por_status = {row['status']: row['total'] for row in cursor.fetchall()}
+
         else:
-            cursor.execute('SELECT * FROM recados WHERE status = ? ORDER BY medico, data_cadastro', (status,))
+            # Comportamento original (filtra pelo status selecionado)
+            cursor.execute("""
+                SELECT *
+                FROM recados
+                WHERE status = ?
+                ORDER BY medico, data_cadastro DESC
+            """, (status,))
+            recados = cursor.fetchall()
 
-        recados = cursor.fetchall()
-        cursor.execute('SELECT status, COUNT(*) as total FROM recados GROUP BY status')
-        contagem_por_status = {row['status']: row['total'] for row in cursor.fetchall()}
+            # Contagem global por status
+            cursor.execute("SELECT status, COUNT(*) AS total FROM recados GROUP BY status")
+            contagem_por_status = {row['status']: row['total'] for row in cursor.fetchall()}
 
+            contagem_por_status_filtrado = None  # não há busca
+
+        # Agrupa por médico
         recados_por_medico = {}
         for recado in recados:
             medico = recado['medico']
             recados_por_medico.setdefault(medico, []).append(recado)
 
-        quantidades_por_medico = {
-            medico: len(lista) for medico, lista in recados_por_medico.items()
-        }
+        quantidades_por_medico = {medico: len(lista) for medico, lista in recados_por_medico.items()}
 
+        # Paleta
         cores_por_medico = {
             "Dr. Andre Salotto Rocha": "#3498db",
             "Dr. Fabiano Morais Nogueira": "#1abc9c",
@@ -55,19 +87,27 @@ def responsavel_routes(conectar_banco, login_requerido):
             "Dr. Demosthenes Santana": "#34495e",
             "Dr. Matheus Laurenti": "#0ef8c9",
             "Dr. Vinicius Reis": "#0A0124",
-            "Dr. Sebastiao Silva":"#410000",
-            "Dr. Guilherme Perassa Gasque":"#022400"
+            "Dr. Sebastiao Silva": "#410000",
+            "Dr. Guilherme Perassa Gasque": "#022400",
+            "Dr. Fernando Filipe": "#033609",
+            "Dr. Antonio Carlos Pirolla Filho": "#033D09",
+            "Dra. Gyovana Campanari": "#1E0122",
+            "Dr. Luis Guilherme Ronchi": "#2E0281",
+            "Dr. Rodolfo Vieira Fontenele": "#1D05A5"
         }
 
         conexao.close()
 
-        return render_template('listar.html',
-                               recados_por_medico=recados_por_medico,
-                               status=status,
-                               cores=cores_por_medico,
-                               quantidades_por_medico=quantidades_por_medico,
-                               contagem_por_status=contagem_por_status)
-
+        return render_template(
+            'listar.html',
+            recados_por_medico=recados_por_medico,
+            status=status,
+            cores=cores_por_medico,
+            quantidades_por_medico=quantidades_por_medico,
+            contagem_por_status=contagem_por_status,
+            contagem_por_status_filtrado=contagem_por_status_filtrado,  # <<< NOVO
+            busca=busca  # opcional: útil para manter o termo no campo
+        )
     @responsavel_bp.route('/recado/<int:id>', endpoint='detalhar_recado')
     @login_requerido(['responsavel'])
     def detalhar_recado(id):
@@ -182,6 +222,35 @@ def responsavel_routes(conectar_banco, login_requerido):
         flash(f'Todos os recados com status "{status}" foram excluídos.', 'success')
         return redirect(url_for('responsavel.listar', status=status))
 
+    
+
+    @responsavel_bp.route('/mover_todos', methods=['POST'])
+    @login_requerido(['responsavel'])
+    def mover_todos():
+        para_status = request.form.get('para_status', '').strip().lower()
+
+        # valores canônicos que o front envia
+        destinos_validos = {'imprimir', 'solicitado_ao_medico'}
+        if para_status not in destinos_validos:
+            flash('Escolha um status de destino válido.', 'erro')
+            return redirect(url_for('responsavel.listar', status='pendente'))
+
+        conexao = conectar_banco()
+        cursor = conexao.cursor()
+
+        # ✅ sem data_atualizacao (não vamos alterar schema do banco)
+        cursor.execute("""
+            UPDATE recados
+            SET status = ?
+            WHERE status = 'pendente'
+        """, (para_status,))
+        conexao.commit()
+        movidos = cursor.rowcount or 0
+        conexao.close()
+
+        flash(f'{movidos} recado(s) movido(s) para "{para_status.replace("_", " ")}".', 'success')
+        return redirect(url_for('responsavel.listar', status=para_status))
+        
     return responsavel_bp
 
 def excluir_recados_antigos(conectar_banco):

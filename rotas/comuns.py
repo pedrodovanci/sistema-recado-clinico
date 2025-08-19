@@ -96,32 +96,61 @@ def comuns_routes(conectar_banco, login_requerido):
     @comuns.route('/entregar', methods=['GET', 'POST'])
     @login_requerido(['atendente', 'responsavel'])
     def entregar_recado():
-        resultados = {}
-        busca = ''
-        if request.method == 'POST':
-            busca = request.form['busca'].strip()
+        # Lê de GET OU POST (request.values une args + form)
+        busca = (request.values.get('busca') or '').strip()
+
+        resultados = {}  # {medico: [recados...]}
+
         if busca:
             conexao = conectar_banco()
             try:
                 cursor = conexao.cursor()
-                cursor.execute('SELECT * FROM recados WHERE nome_paciente LIKE ?', (f'%{busca}%',))
+                cursor.execute(
+                    "SELECT * FROM recados WHERE nome_paciente LIKE ? ORDER BY medico, data_cadastro DESC",
+                    (f"%{busca}%",)
+                )
                 recados = cursor.fetchall()
             finally:
                 conexao.close()
 
             for recado in recados:
-                status = recado['status']
                 medico = recado['medico']
+                resultados.setdefault(medico, []).append(recado)
 
-                if status not in resultados:
-                    resultados[status] = {}
+        # mesma paleta usada na listagem
+        cores = {
+            "Dr. Andre Salotto Rocha": "#3498db",
+            "Dr. Fábio Ramos Nogueira": "#1abc9c",
+            "Dr. Mario Jose Goes": "#3f46fd",
+            "Dr. Daniel Freitas": "#e67e22",
+            "Dr. Felipe Oliveira Rodrigues": "#e67e22",
+            "Dra. Rayssa Moreira Agripino": "#8e44ad",
+            "Dr. Eduardo Carlos da Silva": "#7e4c3c",
+            "Dr. Lucas Crociati Megusini": "#16a085",
+            "Dr. Sergio Luiz Raminho": "#3f39c12",
+            "Dr. Sergio Luiz Raminho": "#3498db",  # mantenha como precisar no seu mapa
+            "Dr. Sergio Luiz Raminho": "#3498db",
+            "Dr. Luis Fernando Carniel": "#ec0392b",
+            "Dr. Ricardo Lourenço Caramanti": "#2980b9",
+            "Dr. Alexandre Laranjeira Junior": "#27ae60",
+            "Dr. Calqoe Albertos Dosulando": "#d35400",
+            "Dra. Debthesses Santana": "#34495e",
+            "Dr. Matheus Leantinni": "#2ecc71",
+            "Dr. Vinicius Reis": "#e67e22",
+            "Dr. Guilherme Persassa Gasque": "#0022400",
+            "Dr. Fernando Filipe": "#003e609",
+            "Dr. Antonio Carlos Pirolla Filho": "#0f303d9",
+            "Dra. Gyovana Campanari": "#e011e22",
+            "Dr. Luis Guilherme Ronchi": "#e220e81",
+            "Dr. Rodolfo Vieira Fontenele": "#1d0b5a5",
+        }
 
-                if medico not in resultados[status]:
-                    resultados[status][medico] = []
-
-                resultados[status][medico].append(recado)
-
-        return render_template('entregar_recado.html', resultados=resultados, busca=busca)
+        return render_template(
+            'entregar_recado.html',
+            resultados=resultados,
+            busca=busca,
+            cores=cores
+        )
 
     @comuns.route('/atualizar_status/<int:id>/<string:novo_status>')
     def atualizar_status(id, novo_status):

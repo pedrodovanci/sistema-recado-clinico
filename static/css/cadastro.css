@@ -1,64 +1,192 @@
+/* ========= Tema base ========= */
+:root {
+  --bg: #f5f7fb;
+  --card: #ffffff;
+  --text: #0f172a;
+  --muted: #6b7280;
+
+  --primary: #2563eb;
+  --primary-600: #1d4ed8;
+  --ring: rgba(37, 99, 235, .25);
+
+  --success: #16a34a;
+  --danger: #e11d48;
+
+  --radius: 16px;
+  --shadow: 0 10px 30px rgba(2, 6, 23, .10);
+}
+
+* { box-sizing: border-box; }
+
 body {
-    margin: 0;
-    font-family: 'Inter', sans-serif;
-    background: url('/static/Fundo_typeform.jpg') no-repeat center center fixed;
-    background-size: cover;
-    color: #333;
+  margin: 0;
+  font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Inter, Roboto, "Helvetica Neue", Arial, sans-serif;
+  color: var(--text);
+  background:
+    url('/static/Fundo_typeform.jpg') no-repeat center / cover fixed;
 }
 
+/* ========= Card principal ========= */
 .container {
-    background: rgba(255, 255, 255, 0.92);
-    max-width: 600px;
-    margin: 60px auto;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+  max-width: 720px;
+  margin: 56px auto;
+  padding: 28px;
+  background: var(--card);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  backdrop-filter: saturate(1.1) blur(6px);
 }
 
+/* ========= Títulos ========= */
 h1, h2 {
-    text-align: center;
-    font-weight: 500;
-    color: #2c3e50;
+  margin: 0 0 12px;
+  text-align: center;
+  font-weight: 700;
+  letter-spacing: .2px;
+  color: var(--text);
 }
+h1 { font-size: 26px; }
+h2 { font-size: 18px; color: var(--muted); font-weight: 600; }
 
+/* ========= Labels e campos ========= */
 label {
-    display: block;
-    margin-top: 15px;
-    font-weight: 500;
+  display: block;
+  margin-top: 14px;
+  font-weight: 600;
+  color: var(--text);
 }
 
 input, select, textarea, button {
-    width: 100%;
-    padding: 10px;
-    margin-top: 6px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 14px;
-    font-family: 'Inter', sans-serif;
-    box-sizing: border-box;
+  width: 100%;
+  margin-top: 6px;
+  font-size: 15px;
+  font-family: inherit;
+  border-radius: 12px;
 }
 
-button {
-    background-color: #2c3e50;
-    color: white;
-    border: none;
-    margin-top: 20px;
-    transition: background 0.3s ease;
-    cursor: pointer;
+input, select, textarea {
+  padding: 12px 14px;
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  transition: border-color .2s ease, box-shadow .2s ease, background .2s ease;
 }
 
-button:hover {
-    background-color: #1a252f;
+input::placeholder, textarea::placeholder { color: #9ca3af; }
+
+/* Estados de foco/acessibilidade */
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px var(--ring);
 }
 
+/* Aparência consistente de inputs especiais */
+input[type="date"] {
+  appearance: none;
+  color-scheme: light;
+}
+select { cursor: pointer; }
+
+/* Textarea mais “clean” */
+textarea {
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.45;
+}
+
+/* ========= Botões ========= */
+button,
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  padding: 12px 16px;
+  border: 0;
+  font-weight: 700;
+  cursor: pointer;
+
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, .20);
+  transition: transform .06s ease, background .2s ease, box-shadow .2s ease;
+}
+
+button:hover,
+.btn:hover {
+  background: var(--primary-600);
+  box-shadow: 0 8px 24px rgba(37, 99, 235, .28);
+}
+
+button:active,
+.btn:active { transform: translateY(1px); }
+
+button:disabled,
+.btn:disabled {
+  cursor: not-allowed;
+  opacity: .6;
+  box-shadow: none;
+}
+
+/* Variações opcionais, caso use classes utilitárias no HTML */
+.btn--ghost {
+  background: #eef2ff;
+  color: var(--primary);
+  box-shadow: none;
+}
+.btn--danger { background: var(--danger); }
+.btn--success { background: var(--success); }
+
+/* ========= Links e área de navegação ========= */
 a {
-    color: #2c3e50;
-    text-decoration: none;
-    font-size: 14px;
-    margin-right: 15px;
+  color: var(--primary);
+  text-decoration: none;
+  font-weight: 600;
 }
+a:hover { text-decoration: underline; }
 
 .links {
-    text-align: center;
-    margin-top: 20px;
+  text-align: center;
+  margin-top: 16px;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+/* ========= Layout responsivo ========= */
+@media (max-width: 640px) {
+  .container { margin: 20px 12px; padding: 20px; }
+  h1 { font-size: 22px; }
+  h2 { font-size: 16px; }
+}
+
+/* ========= Pequenos refinamentos ========= */
+/* Remover setas do input number (se algum campo for numérico) */
+input[type="number"]::-webkit-outer-spin-button,
+input[type="number"]::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+input[type="number"] { appearance: textfield; }
+.toast-container {
+  position: fixed;
+  top: 30px;            /* distância do topo da tela */
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 2000;        /* fica acima de todos os elementos */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.toast {
+  background-color: #d4edda;  /* verde claro */
+  color: #155724;             /* verde escuro */
+  border: 1px solid #c3e6cb;
+  padding: 14px 24px;
+  border-radius: 8px;
+  margin: 5px 0;
+  font-size: 16px;
+  font-weight: bold;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  animation: fadein 0.5s, fadeout 0.5s 4.5s;
 }

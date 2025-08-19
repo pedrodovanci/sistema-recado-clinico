@@ -41,8 +41,9 @@
           class="{% if status == 'pendente' %}ativo pendente{% endif %}"
         >
           Pendente
+          {% set contador = (contagem_por_status_filtrado or contagem_por_status) %}
           <div class="badge-contador">
-            {{ contagem_por_status.get('pendente', 0) }}
+            {{ contador.get('pendente', 0) }}
           </div>
         </a>
 
@@ -51,8 +52,9 @@
           class="{% if status == 'imprimir' %}ativo imprimir{% endif %}"
         >
           Imprimir
+          {% set contador = (contagem_por_status_filtrado or contagem_por_status) %}
           <div class="badge-contador">
-            {{ contagem_por_status.get('imprimir', 0) }}
+            {{ contador.get('imprimir', 0) }}
           </div>
         </a>
 
@@ -61,8 +63,9 @@
           class="{% if status == 'solicitado_ao_medico' %}ativo solicitado_ao_medico{% endif %}"
         >
           Solicitado
+          {% set contador = (contagem_por_status_filtrado or contagem_por_status) %}
           <div class="badge-contador">
-            {{ contagem_por_status.get('solicitado_ao_medico', 0) }}
+            {{ contador.get('solicitado_ao_medico', 0) }}
           </div>
         </a>
 
@@ -71,8 +74,9 @@
           class="{% if status == 'respondido' %}ativo respondido{% endif %}"
         >
           Respondido
+          {% set contador = (contagem_por_status_filtrado or contagem_por_status) %}
           <div class="badge-contador">
-            {{ contagem_por_status.get('respondido', 0) }}
+            {{ contador.get('respondido', 0) }}
           </div>
         </a>
 
@@ -81,8 +85,9 @@
           class="{% if status == 'passar_cartao' %}ativo passar_cartao{% endif %}"
         >
           Passar Cartão
+          {% set contador = (contagem_por_status_filtrado or contagem_por_status) %}
           <div class="badge-contador">
-            {{ contagem_por_status.get('passar_cartao', 0) }}
+            {{ contador.get('passar_cartao', 0) }}
           </div>
         </a>
 
@@ -91,8 +96,9 @@
           class="{% if status == 'so_entregar' %}ativo so_entregar{% endif %}"
         >
           Só Entregar
+          {% set contador = (contagem_por_status_filtrado or contagem_por_status) %}
           <div class="badge-contador">
-            {{ contagem_por_status.get('so_entregar', 0) }}
+            {{ contador.get('so_entregar', 0) }}
           </div>
         </a>
 
@@ -101,8 +107,9 @@
           class="{% if status == 'alto_custo' %}ativo alto_custo{% endif %}"
         >
           Alto Custo
+          {% set contador = (contagem_por_status_filtrado or contagem_por_status) %}
           <div class="badge-contador">
-            {{ contagem_por_status.get('alto_custo', 0) }}
+            {{ contador.get('alto_custo', 0) }}
           </div>
         </a>
 
@@ -111,8 +118,9 @@
           class="{% if status == 'entregue' %}ativo finalizado{% endif %}"
         >
           Entregues
+          {% set contador = (contagem_por_status_filtrado or contagem_por_status) %}
           <div class="badge-contador">
-            {{ contagem_por_status.get('entregue', 0) }}
+            {{ contador.get('entregue', 0) }}
           </div>
         </a>
       </div>
@@ -121,10 +129,14 @@
         <strong>Imprimir:</strong><br />
         <a
           href="{{ url_for('responsavel.imprimir', status=status) }}"
-          target="_blank"
           class="btn-imprimir-status {{ status }}"
           >Todos deste status</a
         >
+        {% if status == 'pendente' %}
+          <button type="button" id="btn-mover-todos" class="btn btn-primario" style="margin-left:8px;">
+            Mover todos
+          </button>
+        {% endif %}
       </div>
       {% if status == 'entregue' %}
       <form
@@ -250,7 +262,6 @@
                 </div>
                 <a
                   href="{{ url_for('responsavel.imprimir_recado', id=r['id']) }}"
-                  target="_blank"
                   class="btn-imprimir"
                   title="Imprimir recado"
                   >🖨️</a
@@ -272,6 +283,38 @@
         <a href="{{ url_for('comuns.logout') }}" class="btn-sair">Sair</a>
       </div>
 
+       {# --- MODAL: só quando estiver na aba Pendente --- #}
+          {% if status == 'pendente' %}
+            <div id="modal-mover-todos" class="modal-overlay" style="display:none;">
+              <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="titulo-mover">
+                <h3 id="titulo-mover">Mover todos os recados pendentes para:</h3>
+
+                <form method="POST" action="{{ url_for('responsavel.mover_todos') }}" id="form-mover-todos">
+                  {# Se usar Flask-WTF/CSRF, descomente:
+                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                  #}
+
+                  <div class="opcoes">
+                    <label class="radio-opcao">
+                      <input type="radio" name="para_status" value="imprimir" required>
+                      <span>Imprimir</span>
+                    </label>
+
+                    <label class="radio-opcao">
+                      <input type="radio" name="para_status" value="solicitado_ao_medico" required>
+                      <span>Solicitado</span>
+                    </label>
+                  </div>
+
+                  <div class="acoes">
+                    <button type="button" class="btn" id="cancelar-mover">Cancelar</button>
+                    <button type="submit" class="btn btn-primario" id="confirmar-mover">Confirmar</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          {% endif %}
+        {# --- FIM DO MODAL --- #}
       <script>
         const acc = document.getElementsByClassName("accordion");
         for (let i = 0; i < acc.length; i++) {
@@ -308,6 +351,78 @@
             }, 1000); // após o fade-out
           }, 5000); // visível por 5 segundos
         });
+      });
+    </script>
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        var btn = document.getElementById('btn-mover-todos');
+        var modal = document.getElementById('modal-mover-todos');
+        var cancelar = document.getElementById('cancelar-mover');
+        var confirmar = document.getElementById('confirmar-mover');
+        var form = document.getElementById('form-mover-todos');
+
+        function abrirModal() {
+          modal.style.display = 'flex';
+          var firstRadio = modal.querySelector('input[type="radio"]');
+          if (firstRadio) firstRadio.focus();
+          document.addEventListener('keydown', escHandler);
+        }
+
+        function fecharModal() {
+          modal.style.display = 'none';
+          document.removeEventListener('keydown', escHandler);
+        }
+        // [N O V O] Dropdown "Alterar Status" por clique
+        const dropdowns = document.querySelectorAll('.dropdown');
+
+        function fecharTodosDropdowns() {
+          dropdowns.forEach(d => d.classList.remove('open'));
+        }
+
+        dropdowns.forEach(d => {
+          const btn = d.querySelector('.dropbtn');
+          if (!btn) return;
+
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();                 // não propaga para o document
+            const jaAberto = d.classList.contains('open');
+            fecharTodosDropdowns();              // fecha os outros
+            if (!jaAberto) d.classList.add('open');
+          });
+        });
+
+        // fecha ao clicar fora
+        document.addEventListener('click', fecharTodosDropdowns);
+
+        // fecha com ESC
+        document.addEventListener('keydown', function (e) {
+          if (e.key === 'Escape') fecharTodosDropdowns();
+        });
+        function escHandler(e) {
+          if (e.key === 'Escape' && modal.style.display === 'flex') {
+            fecharModal();
+          }
+        }
+
+        if (btn && modal) {
+          btn.addEventListener('click', abrirModal);
+        }
+        if (cancelar && modal) {
+          cancelar.addEventListener('click', fecharModal);
+        }
+        if (modal) {
+          modal.addEventListener('click', function (e) {
+            if (e.target === modal) fecharModal();
+          });
+        }
+        if (form) {
+          form.addEventListener('submit', function () {
+            if (confirmar) {
+              confirmar.disabled = true;
+              confirmar.innerText = 'Movendo...';
+            }
+          });
+        }
       });
     </script>
   </body>

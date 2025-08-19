@@ -1,123 +1,203 @@
 <!DOCTYPE html>
 <html lang="pt-br">
-<style>
-    .container {
-        max-width: 95%;
-        margin: 40px auto;
-        padding: 20px;
-        border-radius: 12px;
-        background-color: rgba(255, 255, 255, 0.95);
-        box-shadow: 0 0 12px rgba(0, 0, 0, 0.1);
-    }
-
-    .panel table {
-        width: 100%;
-        border-collapse: collapse;
-        background: #fff;
-        border-radius: 6px;
-        overflow: hidden;
-    }
-
-    .panel th,
-    .panel td {
-        padding: 12px 14px;
-        text-align: center;
-        border-bottom: 1px solid #e0e0e0;
-        vertical-align: middle;
-        font-size: 14px;
-    }
-
-    .panel td:nth-child(3) {
-        max-width: 280px;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-        }
-
-    .status {
-        padding: 6px 12px;
-        border-radius: 6px;
-        color: white;
-        font-weight: bold;
-        display: inline-block;
-        text-transform: capitalize;
-        }
-
-    .status.pendente {
-        background-color: #e74c3c;
-    }
-
-    .status.finalizado {
-        background-color: #7f8c8d;
-    }
-
-    .btn-imprimir {
-        padding: 6px 12px;
-        background-color: #ecf0f1;
-        border: 1px solid #ccc;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-    }
-
-    .btn-imprimir:hover {
-        background-color: #dcdcdc;
-    }
-    
-    .titulo-status {
-        color: white;
-        padding: 12px;
-        border-radius: 6px;
-        font-size: 22px;
-        text-align: center;
-        margin-top: 30px;  /* 👈 adiciona espaço antes */
-        margin-bottom: 15px;
-   }
-    .btn-voltar {
-        background-color: #bdc3c7;
-        color: #2c3e50;
-        padding: 8px 14px;
-        border-radius: 8px;
-        text-decoration: none;
-        font-weight: bold;
-        transition: background-color 0.3s ease;
-    }
-
-    .btn-voltar:hover {
-        background-color: #95a5a6;
-    }
-
-</style>
 <head>
-  <meta charset="UTF-8">  
+  <meta charset="UTF-8" />
   <title>Entregar Recado</title>
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/listar.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/entregar_recado.css') }}">
+  <style>
+    /* --- Ajustes leves para deixar moderno sem depender de novo CSS --- */
+    body.fundo {
+      background: #d9cbb1 url("{{ url_for('static', filename='img/Fundo_typeform.jpg') }}") no-repeat center top / cover fixed;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
+      color: #1f2937;
+    }
+    .topbar {
+      display:flex; align-items:center; justify-content:center; gap:.75rem;
+      padding: 18px 14px;
+    }
+    .topbar a.btn-voltar {
+      text-decoration:none; background:#111827; color:#fff; border-radius:10px;
+      padding: 10px 16px; font-weight:600; box-shadow: 0 2px 6px rgba(0,0,0,.12);
+    }
+    .wrapper {
+      max-width: 1100px; margin: 0 auto 56px; background: #ffffffef;
+      border-radius: 14px; padding: 28px; box-shadow: 0 8px 30px rgba(0,0,0,.08);
+      border: 1px solid #ececec;
+    }
+    h1.title {
+      text-align:center; font-size: 28px; margin: 4px 0 18px 0; color:#111827;
+    }
+
+    /* Busca central moderna */
+    form.busca {
+      display:flex; justify-content:center; align-items:center; gap:.5rem; margin: 10px 0 22px;
+    }
+    .search-wrap {
+      position: relative; width: min(720px, 88vw);
+    }
+    .search-wrap input[type="text"]{
+      width:100%; padding: 14px 44px 14px 16px; border: 1px solid #e5e7eb; outline: none;
+      border-radius: 999px; background:#fff; font-size:15px;
+      box-shadow: inset 0 1px 0 rgba(0,0,0,.03), 0 2px 10px rgba(0,0,0,.04);
+    }
+    .search-wrap button {
+      position:absolute; top:50%; right:6px; transform:translateY(-50%);
+      border:none; background:#2563eb; color:#fff; border-radius: 999px; width:36px; height:36px; cursor:pointer;
+      display:flex; align-items:center; justify-content:center; font-weight:700;
+      box-shadow: 0 2px 10px rgba(37,99,235,.35);
+    }
+    .search-wrap button:hover { filter: brightness(.95); }
+
+    /* Flash (verde e central, fora do container) */
+    .flash-host {
+      position: fixed; top: 14px; left: 0; right: 0; display:flex; justify-content:center; z-index: 1000; pointer-events:none;
+    }
+    .flash {
+      pointer-events:auto; background:#def7ec; color:#03543f; border:1px solid #84e1bc; border-radius:10px;
+      padding:10px 14px; font-weight:600; box-shadow:0 8px 20px rgba(0,0,0,.08);
+      display:flex; align-items:center; gap:.5rem;
+    }
+
+    /* Médico (accordion simplificado) */
+    .medico-header {
+      margin-top: 22px; border-radius: 10px 10px 0 0; color:#fff; font-weight:700;
+      padding: 10px 14px; display:flex; align-items:center; justify-content:space-between;
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,.28);
+    }
+    .quantia-pill {
+      background: rgba(255,255,255,.22); padding: 2px 8px; border-radius:999px; font-weight:700; font-size: 12px;
+    }
+    .medico-card {
+      border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px; background:#fff;
+      overflow:hidden; box-shadow: 0 6px 20px rgba(0,0,0,.05);
+    }
+
+    table {
+      width:100%; border-collapse: collapse; font-size: 14px;
+    }
+    thead th {
+      background:#f9fafb; color:#111827; text-align:left; padding:10px 12px; border-bottom:1px solid #e5e7eb; font-weight:700;
+    }
+    tbody td {
+      padding:12px; border-bottom:1px solid #f3f4f6; vertical-align: top;
+    }
+    tbody tr:hover td { background:#fbfbfb; }
+    .nome-paciente a {
+      color:#0f172a; text-decoration: none; font-weight:700;
+    }
+    .nome-paciente a:hover { text-decoration: underline; }
+    .status-tag {
+      font-weight:700; background:#f3f4f6; color:#111827; padding:6px 10px; border-radius:999px; display:inline-block;
+    }
+    .acoes .btn-entregar {
+      background:#2563eb; color:#fff; border:none; border-radius:10px; padding:8px 12px; font-weight:700;
+      text-decoration:none; display:inline-block; box-shadow:0 6px 18px rgba(37,99,235,.28);
+    }
+    .acoes .btn-entregar:hover { filter:brightness(.95); }
+
+    .vazio {
+      background:#fff; border: 1px dashed #e5e7eb; padding: 22px; border-radius: 10px; text-align:center; color:#6b7280;
+      margin-top: 12px;
+    }
+
+    @media (max-width: 800px){
+      thead { display:none; }
+      table, tbody, tr, td { display:block; width:100%; }
+      tbody tr { margin-bottom:14px; border:1px solid #eee; border-radius:8px; overflow:hidden; }
+      tbody td { border:none; border-bottom:1px solid #f3f4f6; }
+      tbody td:last-child { border-bottom:none; }
+      tbody td::before {
+        content: attr(data-th);
+        display:block; font-size:12px; color:#6b7280; margin-bottom:4px; text-transform:uppercase; letter-spacing:.02em;
+      }
+    }
+    /* Botão de busca moderno */
+    .campo-busca {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin: 20px 0;
+    }
+
+    .campo-busca input[type="text"] {
+      flex: 1;
+      max-width: 400px;
+      padding: 12px 16px;
+      border: 1px solid #ccc;
+      border-radius: 30px;
+      outline: none;
+      font-size: 15px;
+      transition: border-color 0.3s, box-shadow 0.3s;
+    }
+
+    .campo-busca input[type="text"]:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37,99,235,.2);
+    }
+
+    /* Botão redondo com ícone */
+    .campo-busca button {
+      background-color: #2563eb;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 46px;
+      height: 46px;
+      font-size: 18px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 12px rgba(37,99,235,.3);
+      transition: background-color 0.25s ease, transform 0.15s ease;
+    }
+
+    .campo-busca button:hover {
+      background-color: #1d4ed8;
+      transform: scale(1.05);
+    }
+</style>
 </head>
 <body class="fundo">
-    
-    <div style="text-align: center; margin-bottom: 20px;">
-        <a href="{{ url_for('comuns.inicio') }}" class="btn-voltar">Voltar<a>
-    </div>
-  <div class="container">
-    <h1>Digite o nome do paciente para encontrar seu recado</h1>
-    <form method="POST" class="campo-busca">
-      <input type="text" name="busca" placeholder="Nome do paciente..." value="{{ busca }}" required>
-      <button type="submit">🔍 Buscar</button>
+
+  <!-- FLASH CENTRAL SUPERIOR -->
+  <div class="flash-host">
+    {% with mensagens = get_flashed_messages(with_categories=true) %}
+      {% if mensagens %}
+        {% for categoria, msg in mensagens %}
+          <div class="flash">
+            ✅ {{ msg.replace('_', ' ') }}
+          </div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  </div>
+
+  <div class="topbar">
+    <a href="{{ url_for('comuns.cadastro_recado') }}" class="btn-voltar">Voltar</a>
+  </div>
+
+  <div class="wrapper">
+    <h1 class="title">Digite o nome do paciente para encontrar seu recado</h1>
+
+    <!-- BUSCA -->
+    <form method="GET" action="{{ url_for('comuns.entregar_recado') }}" class="campo-busca">
+      <input type="text" name="busca" placeholder="Nome do paciente..." value="{{ request.args.get('busca', '') }}" required>
+      <button type="submit">🔍</button>
     </form>
 
+    <!-- RESULTADOS -->
     {% if resultados %}
-      {% for status, medicos in resultados.items() %}
-        <div class="titulo-status {{ status }}">
-          {% if status == 'entregue' %}
-            Entregue
-          {% else %}
-            {{ status.replace('_', ' ').capitalize() }}
-          {% endif %}
+      {% for medico, recados in resultados.items() %}
+        <!-- topo com a cor do médico -->
+        <div class="medico-header" style="background: {{ cores.get(medico, '#3498db') }}">
+          <div>{{ medico }}</div>
+          <span class="quantia-pill">{{ recados|length }}</span>
         </div>
 
-        {% for medico, recados in medicos.items() %}
-          <button class="accordion">{{ medico }}</button>
-          <div class="panel">
+        <div class="medico-card">
+          {% if recados %}
             <table>
               <thead>
                 <tr>
@@ -125,73 +205,50 @@
                   <th>Telefone</th>
                   <th>Mensagem</th>
                   <th>Status</th>
-                  <th>Ação</th>
+                  <th style="width:120px;">Ação</th>
                 </tr>
               </thead>
               <tbody>
                 {% for r in recados %}
-                <tr>
-                  <td>{{ r['nome_paciente'] }}</td>
-                  <td>{{ r['telefone'] }}</td>
-                  <td>{{ r['descricao'] }}</td>
-                  <td>
-                    <span class="status {{ r['status'] }}">
-                      {% if r['status'] == 'finalizado' %}
-                        Entregue
-                      {% else %}
-                        {{ r['status'] }}
-                      {% endif %}
-                    </span>
-                  </td>
-
-                  <td>
-                    <a href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='entregue') }}" class="btn-imprimir">Entregar</a>
-                  </td>
-                </tr>
+                  <tr>
+                    <td class="nome-paciente" data-th="Paciente">
+                      <a href="{{ url_for('responsavel.detalhar_recado', id=r['id']) }}" title="Ver detalhes">{{ r['nome_paciente'] }}</a>
+                    </td>
+                    <td data-th="Telefone">{{ r['telefone'] or '—' }}</td>
+                    <td data-th="Mensagem">{{ r['descricao'] or '—' }}</td>
+                    <td data-th="Status"><span class="status-tag">{{ r['status'].replace('_', ' ') }}</span></td>
+                    <td class="acoes" data-th="Ação">
+                      <a class="btn-entregar"
+                         href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='entregue') }}"
+                         onclick="return confirm('Confirmar entrega deste recado?');">
+                        Entregar
+                      </a>
+                    </td>
+                  </tr>
                 {% endfor %}
               </tbody>
             </table>
-          </div>
-        {% endfor %}
+          {% else %}
+            <div class="vazio">Nenhum recado para este médico.</div>
+          {% endif %}
+        </div>
       {% endfor %}
-    {% elif busca %}
-      <p><strong>Recado não encontrado.</strong></p>
+    {% else %}
+      <div class="vazio">Nenhum recado encontrado para sua busca.</div>
     {% endif %}
   </div>
-    {% with mensagens = get_flashed_messages(with_categories=true) %}
-  {% if mensagens %}
-    <div class="toast-container">
-      {% for categoria, msg in mensagens %}
-        <div class="toast {{ categoria }}">✅ {{ msg.replace('_', ' ') }}</div>
-      {% endfor %}
-    </div>
-  {% endif %}
-{% endwith %}
-
-<script>
-  window.addEventListener("load", function () {
-    const toasts = document.querySelectorAll(".toast");
-    toasts.forEach((toast) => {
-      setTimeout(() => {
-        toast.style.transition = "opacity 1s ease";
-        toast.style.opacity = "0";
-        setTimeout(() => {
-          toast.remove();
-        }, 1000);
-      }, 5000); // 5s visível
-    });
-  });
-</script>
 
   <script>
-    const acc = document.getElementsByClassName("accordion");
-    for (let i = 0; i < acc.length; i++) {
-      acc[i].addEventListener("click", function () {
-        this.classList.toggle("active");
-        const panel = this.nextElementSibling;
-        panel.style.display = panel.style.display === "block" ? "none" : "block";
-      });
-    }
+    // Fade-out suave do flash
+    window.addEventListener("load", function () {
+      const flash = document.querySelector(".flash-host");
+      if (!flash) return;
+      setTimeout(() => {
+        flash.style.transition = "opacity 0.9s ease";
+        flash.style.opacity = "0";
+        setTimeout(() => flash.remove(), 900);
+      }, 4200);
+    });
   </script>
 </body>
 </html>
