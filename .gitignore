@@ -1,13 +1,24 @@
-# Ignorar cache e banco local
+# Python
 __pycache__/
 *.pyc
+
+# Builds / executáveis
+build/
+dist/
+*.exe
+*.zip
+*.pyz
+*.toc
+
+# Logs e backups
+logs/
+backups/
+
+# Banco local
+recados.db
+*.sqlite
 *.db
 
-# Backups
-*.sqlite*
-*.bak
-*.old
-*.alteracao_prioridades.sqlite3-query*
-# Ambiente virtual (caso use futuramente)
-venv/
-.env
+# Ambientes
+.venv/
+env/
