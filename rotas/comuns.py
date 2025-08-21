@@ -1,6 +1,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from datetime import datetime
-from urllib.parse import urlparse
+from urllib.parse import urlparse, parse_qs
+from rotas.paleta_medicos import CORES_MEDICOS as cores_por_medico
 
 def comuns_routes(conectar_banco, login_requerido):
     comuns = Blueprint('comuns', __name__)
@@ -96,89 +97,150 @@ def comuns_routes(conectar_banco, login_requerido):
     @comuns.route('/entregar', methods=['GET', 'POST'])
     @login_requerido(['atendente', 'responsavel'])
     def entregar_recado():
-        # Lê de GET OU POST (request.values une args + form)
-        busca = (request.values.get('busca') or '').strip()
+        from collections import OrderedDict
 
-        resultados = {}  # {medico: [recados...]}
+        status = request.args.get('status', 'respondido')
+        busca = (request.args.get('busca') or '').strip()
+        perfil = session.get('perfil', '') 
 
-        if busca:
-            conexao = conectar_banco()
-            try:
-                cursor = conexao.cursor()
-                cursor.execute(
-                    "SELECT * FROM recados WHERE nome_paciente LIKE ? ORDER BY medico, data_cadastro DESC",
-                    (f"%{busca}%",)
-                )
-                recados = cursor.fetchall()
-            finally:
-                conexao.close()
-
-            for recado in recados:
-                medico = recado['medico']
-                resultados.setdefault(medico, []).append(recado)
-
-        # mesma paleta usada na listagem
-        cores = {
-            "Dr. Andre Salotto Rocha": "#3498db",
-            "Dr. Fábio Ramos Nogueira": "#1abc9c",
-            "Dr. Mario Jose Goes": "#3f46fd",
-            "Dr. Daniel Freitas": "#e67e22",
-            "Dr. Felipe Oliveira Rodrigues": "#e67e22",
-            "Dra. Rayssa Moreira Agripino": "#8e44ad",
-            "Dr. Eduardo Carlos da Silva": "#7e4c3c",
-            "Dr. Lucas Crociati Megusini": "#16a085",
-            "Dr. Sergio Luiz Raminho": "#3f39c12",
-            "Dr. Sergio Luiz Raminho": "#3498db",  # mantenha como precisar no seu mapa
-            "Dr. Sergio Luiz Raminho": "#3498db",
-            "Dr. Luis Fernando Carniel": "#ec0392b",
-            "Dr. Ricardo Lourenço Caramanti": "#2980b9",
-            "Dr. Alexandre Laranjeira Junior": "#27ae60",
-            "Dr. Calqoe Albertos Dosulando": "#d35400",
-            "Dra. Debthesses Santana": "#34495e",
-            "Dr. Matheus Leantinni": "#2ecc71",
-            "Dr. Vinicius Reis": "#e67e22",
-            "Dr. Guilherme Persassa Gasque": "#0022400",
-            "Dr. Fernando Filipe": "#003e609",
-            "Dr. Antonio Carlos Pirolla Filho": "#0f303d9",
-            "Dra. Gyovana Campanari": "#e011e22",
-            "Dr. Luis Guilherme Ronchi": "#e220e81",
-            "Dr. Rodolfo Vieira Fontenele": "#1d0b5a5",
+        # ordem fixa e rótulos
+        status_ordem = [
+            'pendente', 'imprimir', 'solicitado_ao_medico', 'respondido',
+            'passar_cartao', 'so_entregar', 'alto_custo', 'entregue'
+        ]
+        labels = {
+            'pendente': 'Pendente',
+            'imprimir': 'Imprimir',
+            'solicitado_ao_medico': 'Solicitado ao médico',
+            'respondido': 'Respondido',
+            'passar_cartao': 'Passar cartão',
+            'so_entregar': 'Só entregar',
+            'alto_custo': 'Alto custo',
+            'entregue': 'Entregue',
         }
+
+        resultados_por_status = {s: [] for s in status_ordem}
+        contagem_por_status   = {s: 0  for s in status_ordem}
+
+        conn = conectar_banco()
+        try:
+            cur = conn.cursor()
+
+            if not busca:
+                # Sem busca: apenas contagens para as abas
+                for s in status_ordem:
+                    cur.execute("SELECT COUNT(*) FROM recados WHERE status = ?", (s,))
+                    contagem_por_status[s] = cur.fetchone()[0]
+            else:
+                # Com busca: traz todos os recados que batem e agrupa por status
+                like = f'%{busca}%'
+                cur.execute("""
+                    SELECT id, nome_paciente, telefone, data_cadastro, descricao, status, medico, usuario
+                    FROM recados
+                    WHERE nome_paciente LIKE ?
+                    ORDER BY CASE status
+                        WHEN 'pendente' THEN 1
+                        WHEN 'imprimir' THEN 2
+                        WHEN 'solicitado_ao_medico' THEN 3
+                        WHEN 'respondido' THEN 4
+                        WHEN 'passar_cartao' THEN 5
+                        WHEN 'so_entregar' THEN 6
+                        WHEN 'alto_custo' THEN 7
+                        WHEN 'entregue' THEN 8
+                        ELSE 99 END,
+                        medico COLLATE NOCASE ASC,
+                        datetime(data_cadastro) DESC
+                """, (like,))
+                cols = ['id','nome_paciente','telefone','data_cadastro','descricao','status','medico','usuario']
+                rows = [dict(zip(cols, r)) for r in cur.fetchall()]
+
+                for r in rows:
+                    st = r['status']
+                    if st in resultados_por_status:
+                        resultados_por_status[st].append(r)
+
+                contagem_por_status = {s: len(resultados_por_status[s]) for s in status_ordem}
+        finally:
+            conn.close()
+
+        # Agrupa por médico dentro de cada status (sem acordeão; só cabeçalhos coloridos)
+        agrupado_por_status_medico = {}
+        for st in status_ordem:
+            grupos = OrderedDict()
+            for r in resultados_por_status[st]:
+                med = r.get('medico') or '---'
+                grupos.setdefault(med, []).append(r)
+            agrupado_por_status_medico[st] = grupos
+
+        # Flag confiável calculada no backend
+        tem_algum = any(len(resultados_por_status[s]) > 0 for s in status_ordem)
+        cores_lower = {k.strip().lower(): v for k, v in cores_por_medico.items()}
 
         return render_template(
             'entregar_recado.html',
-            resultados=resultados,
+            status=status,
             busca=busca,
-            cores=cores
+            status_ordem=status_ordem,
+            labels=labels,
+            resultados_por_status=resultados_por_status,
+            contagem_por_status=contagem_por_status,
+            tem_algum=tem_algum,
+            cores_lower=cores_lower,
+            perfil=perfil   
         )
 
+   
     @comuns.route('/atualizar_status/<int:id>/<string:novo_status>')
     def atualizar_status(id, novo_status):
-        if 'usuario' not in session or session.get('perfil') not in ['responsavel', 'atendente']:
-            return redirect(url_for('comuns.login'))
-
+        # 1) Atualiza o status (e trata finalizado_por)
         conexao = conectar_banco()
         try:
             cursor = conexao.cursor()
+
             if novo_status == 'entregue':
-                finalizador = session['usuario']
-                cursor.execute('UPDATE recados SET status = ?, finalizado_por = ? WHERE id = ?', (novo_status, finalizador, id))
+                # indo para ENTREGUE => grava quem entregou
+                finalizador = session.get('usuario', '---')
+                cursor.execute(
+                    'UPDATE recados SET status = ?, finalizado_por = ? WHERE id = ?',
+                    (novo_status, finalizador, id)
+                )
             else:
-                cursor.execute('UPDATE recados SET status = ? WHERE id = ?', (novo_status, id))
+                # saindo de ENTREGUE (ou qualquer outra transição que não seja ENTREGUE)
+                # zera o finalizado_por
+                cursor.execute(
+                    'UPDATE recados SET status = ?, finalizado_por = NULL WHERE id = ?',
+                    (novo_status, id)
+                )
+
             conexao.commit()
         finally:
             conexao.close()
 
-        flash(f'Recado atualizado para o status "{novo_status}" com sucesso!', 'success')
+        flash(f'Recado atualizado para o status "{novo_status.replace("_"," ")}" com sucesso!', 'success')
 
-        ref = request.referrer
-        if ref:
-            parsed = urlparse(ref)
-            if '/listar' in parsed.path:
-                return redirect(ref)
-            elif '/entregar' in parsed.path:
-                return redirect(url_for('comuns.entregar_recado'))
+        # 2) Decide para onde voltar com segurança (SEMPRE retorna algo)
+        ref = request.headers.get('Referer', '')
+        try:
+            p = urlparse(ref)
+            qs = parse_qs(p.query or '')
 
-        return redirect(url_for('responsavel.listar' if session['perfil'] == 'responsavel' else 'comuns.inicio'))
+            prev_status = (qs.get('status', [''])[0] or '').strip() or None
+            busca = (qs.get('busca', [''])[0] or '').strip() or None
+
+            # veio da tela ENTREGAR?
+            if '/entregar' in p.path:
+                return redirect(url_for('comuns.entregar_recado', status=prev_status, busca=busca))
+
+            # veio da LISTAGEM?
+            if '/listar' in p.path:
+                # se não houver status na URL anterior, volta para o status atual do item
+                return redirect(url_for('responsavel.listar', status=prev_status or novo_status, busca=busca))
+
+        except Exception:
+            # falha ao interpretar o referer? Sem crise, temos fallback
+            pass
+
+        # Fallback definitivo
+        return redirect(url_for('responsavel.listar', status=novo_status))
 
     return comuns

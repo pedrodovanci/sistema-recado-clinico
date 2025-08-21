@@ -6,9 +6,9 @@ body {
   background: url("/static/Fundo_typeform.jpg") no-repeat center center fixed;
   background-size: cover;
 }
-
+:root { --container-alpha: .85; }
 .container {
-  background-color: #fff;
+  background: rgba(255, 255, 255, var(--container-alpha)) !important;
   max-width: 95%;
   margin: 50px auto;
   padding: 30px;
@@ -436,8 +436,74 @@ body, button, .btn, a, input, select, textarea{
   border: 0;                /* caso tenha herdado algo */
   padding: 0;               /* remove espaçamento de “botão” */
 }
+.status {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  color: #fff;                 /* texto branco por padrão */
+  background: #6b7280;         /* fallback (cinza) */
+  letter-spacing: .2px;
+  text-transform: none;
+}
 
+/* Mesmas cores das “caixinhas” de filtro do topo */
+.status.pendente            { background-color: #ef4444; } /* vermelho */
+.status.imprimir            { background-color: #3b82f6; } /* azul */
+.status.solicitado_ao_medico{ background-color: #f59e0b; } /* laranja */
+.status.respondido          { background-color: #10b981; } /* verde */
+.status.passar_cartao       { background-color: #8b5cf6; } /* roxo */
+.status.so_entregar         { background-color: #14b8a6; } /* teal */
+.status.alto_custo          { background-color: #b91c1c; } /* vinho */
+.status.entregue            { background-color: #6b7280; } /* cinza */
+
+/* Se quiser texto escuro no laranja (opcional): */
+/* .status.solicitado_ao_medico { color:#111827; } */
+
+/* ==========================================
+   Link do paciente como “botão suave” (sem sublinhado)
+   ========================================== */
+.btn-paciente {
+  display: inline-block;
+  padding: 6px 12px;
+  border-radius: 10px;
+  text-decoration: none !important;      /* sem underline, inclusive no hover */
+  color: #111827;                        /* texto escuro para ler no fundo claro */
+  font-weight: 600;
+  line-height: 1.2;
+  background: linear-gradient(
+     180deg,
+     rgba(0,0,0,0.04),
+     rgba(0,0,0,0.02)
+  );                                     /* gradiente bem sutil que mistura com o container */
+  border: 1px solid rgba(0,0,0,0.06);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+  transition: box-shadow .2s ease, transform .12s ease, background .2s ease;
+}
+
+.btn-paciente:hover {
+  text-decoration: none !important;
+  background: linear-gradient(180deg, rgba(0,0,0,0.06), rgba(0,0,0,0.03));
+  box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+  transform: translateY(-1px);
+}
+
+.btn-paciente:active {
+  transform: translateY(0);              /* evita “pular” ao clicar */
+}
+
+.btn-paciente:focus-visible {
+  outline: 2px solid #3b82f6;            /* acessível */
+  outline-offset: 2px;
+}
 .btn-paciente:hover,
 .link-paciente:hover {
   text-decoration: underline; /* só sublinha no hover */
 }
+/* garante que todas as listas comecem fechadas */
+.panel { display: none; }
+
+/* (opcional) quando o botão tiver a classe .active, mostra o painel ao lado */
+.accordion.active + .panel { display: block; }

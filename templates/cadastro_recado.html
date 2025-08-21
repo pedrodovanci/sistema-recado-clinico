@@ -9,14 +9,14 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
 </head>
 <body>
-    <div class="container">
-        <h2>Bem-vindo, {{ usuario }}!</h2>
+    <div class="container cadastro">
+        <p class="boas-vindas">Bem-vindo, {{ usuario }}!</p>
         <div class="links">
             <a href="{{ url_for('comuns.logout') }}">Sair</a>
             <a href="{{ url_for('responsavel.listar') }}">Ir para Listagem</a>
         </div>
 
-        <h1>Cadastro de Recados</h1>
+        <h1 class="boas-vindas">Cadastro de Recados</h1>
         <form action="{{ url_for('comuns.salvar') }}" method="post">
             <label>Médico:</label>
             <select name="medico" required>
@@ -24,7 +24,6 @@
                 <option value="Dr. Andre Salotto Rocha">Dr. Andre Salotto Rocha</option>
                 <option value="Dr. Caique Alberto Dosualdo">Dr. Caique Alberto Dosualdo</option>
                 <option value="Dr. Carlos Rocha">Dr. Carlos Rocha</option>
-                <option value="Dr. Fernando Filipe">Dr. Fernando Filipe</option>
                 <option value="Dr. Demosthenes Santana">Dr. Demosthenes Santana</option>
                 <option value="Dr. Dionei Freitas de Morais">Dr. Dionei Freitas de Morais</option>
                 <option value="Dr. Eduardo Carlos da Silva">Dr. Eduardo Carlos da Silva</option>
@@ -47,7 +46,7 @@
                 <option value="Dr. Luis Guilherme Ronchi">Dr. Luis Guilherme Ronchi</option>
                 <option value="Dr. Rodolfo Vieira Fontenele">Dr. Rodolfo Vieira Fontenele</option>
             </select>
-
+            
             <label>Prioridade:</label>
             <select name="prioridade" required>
                 <option value="Urgência - até 24 horas">Urgência - até 24 horas</option>

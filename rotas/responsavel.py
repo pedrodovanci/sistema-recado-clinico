@@ -4,6 +4,7 @@
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash
 from datetime import datetime, timedelta
 from urllib.parse import urlparse
+from rotas.paleta_medicos import CORES_MEDICOS as cores_por_medico
 
 responsavel_bp = Blueprint('responsavel', __name__)
 
@@ -66,37 +67,8 @@ def responsavel_routes(conectar_banco, login_requerido):
             recados_por_medico.setdefault(medico, []).append(recado)
 
         quantidades_por_medico = {medico: len(lista) for medico, lista in recados_por_medico.items()}
-
-        # Paleta
-        cores_por_medico = {
-            "Dr. Andre Salotto Rocha": "#3498db",
-            "Dr. Fabiano Morais Nogueira": "#1abc9c",
-            "Dr. Mario Jose Goes": "#3fdf0e",
-            "Dr. Dionei Freitas de Morais": "#e67e22",
-            "Dr. Felipe Oliveira Rodrigues": "#f546dd",
-            "Dra. Raysa Moreira Aprigio": "#8e44ad",
-            "Dr. Eduardo Carlos da Silva": "#e74c3c",
-            "Dr. Lucas Crociati Meguins": "#16a085",
-            "Dr. Sergio Luiz Ramin": "#f39c12",
-            "Dr. Carlos Rocha": "#2c3e50",
-            "Dr. Luis Fernando": "#141414",
-            "Dr. Linoel Curado Valsechi": "#c0392b",
-            "Dr. Ricardo Lourenço Caramanti": "#2980b9",
-            "Dr. Alexandre Laranjeira Junior": "#27ae60",
-            "Dr. Caique Alberto Dosualdo": "#d35400",
-            "Dr. Demosthenes Santana": "#34495e",
-            "Dr. Matheus Laurenti": "#0ef8c9",
-            "Dr. Vinicius Reis": "#0A0124",
-            "Dr. Sebastiao Silva": "#410000",
-            "Dr. Guilherme Perassa Gasque": "#022400",
-            "Dr. Fernando Filipe": "#033609",
-            "Dr. Antonio Carlos Pirolla Filho": "#033D09",
-            "Dra. Gyovana Campanari": "#1E0122",
-            "Dr. Luis Guilherme Ronchi": "#2E0281",
-            "Dr. Rodolfo Vieira Fontenele": "#1D05A5"
-        }
-
         conexao.close()
+        
 
         return render_template(
             'listar.html',
@@ -223,34 +195,59 @@ def responsavel_routes(conectar_banco, login_requerido):
         return redirect(url_for('responsavel.listar', status=status))
 
     
-
+  
     @responsavel_bp.route('/mover_todos', methods=['POST'])
     @login_requerido(['responsavel'])
     def mover_todos():
-        para_status = request.form.get('para_status', '').strip().lower()
+        de_status   = (request.form.get('de_status') or 'pendente').strip().lower()
+        para_status = (request.form.get('para_status') or '').strip().lower()
+        busca       = (request.form.get('busca') or '').strip()
 
-        # valores canônicos que o front envia
-        destinos_validos = {'imprimir', 'solicitado_ao_medico'}
-        if para_status not in destinos_validos:
-            flash('Escolha um status de destino válido.', 'erro')
-            return redirect(url_for('responsavel.listar', status='pendente'))
+        # Regras claras por origem
+        destinos_validos_por_origem = {
+            'pendente':   {'imprimir', 'solicitado_ao_medico'},
+            'respondido': {'entregue'},   # 👈 só “Entregue” em Respondido
+        }
+
+        if de_status not in destinos_validos_por_origem or \
+        para_status not in destinos_validos_por_origem[de_status]:
+            flash('Escolha um status de destino válido para este status.', 'danger')
+            return redirect(url_for('responsavel.listar', status=de_status, busca=busca or None))
 
         conexao = conectar_banco()
-        cursor = conexao.cursor()
+        try:
+            cursor = conexao.cursor()
 
-        # ✅ sem data_atualizacao (não vamos alterar schema do banco)
-        cursor.execute("""
-            UPDATE recados
-            SET status = ?
-            WHERE status = 'pendente'
-        """, (para_status,))
-        conexao.commit()
-        movidos = cursor.rowcount or 0
-        conexao.close()
+            # WHERE: de qual status e (opcional) busca por paciente
+            where = ' WHERE status = ?'
+            params_where = [de_status]
+            if busca:
+                where += ' AND nome_paciente LIKE ?'
+                params_where.append(f'%{busca}%')
 
-        flash(f'{movidos} recado(s) movido(s) para "{para_status.replace("_", " ")}".', 'success')
-        return redirect(url_for('responsavel.listar', status=para_status))
-        
+            if para_status == 'entregue':
+                # Preencher "Entregue por"
+                finalizador = session.get('usuario', '---')
+                sql = f'UPDATE recados SET status = ?, finalizado_por = ?{where}'
+                params = [para_status, finalizador] + params_where
+            
+            elif de_status == 'entregue' and para_status != 'entregue':
+                sql = f'UPDATE recados SET status = ?, finalizado_por = NULL{where}'
+                params = [para_status] + params_where
+            
+            else:
+                sql = f'UPDATE recados SET status = ?{where}'
+                params = [para_status] + params_where
+
+            cursor.execute(sql, params)
+            conexao.commit()
+            movidos = cursor.rowcount or 0
+        finally:
+            conexao.close()
+
+        flash(f'{movidos} recado(s) movido(s) para "{para_status.replace("_"," ")}".', 'success')
+        return redirect(url_for('responsavel.listar', status=para_status, busca=busca or None))
+    
     return responsavel_bp
 
 def excluir_recados_antigos(conectar_banco):

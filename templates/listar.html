@@ -132,7 +132,7 @@
           class="btn-imprimir-status {{ status }}"
           >Todos deste status</a
         >
-        {% if status == 'pendente' %}
+        {% if status in ['pendente', 'respondido'] %}
           <button type="button" id="btn-mover-todos" class="btn btn-primario" style="margin-left:8px;">
             Mover todos
           </button>
@@ -162,7 +162,7 @@
       {% endif %}
 
 
-      <!-- Acordeão -->
+      <!-- Acordeao -->
       {% for medico, recados_medico in recados_por_medico.items() %}
       <button
         class="accordion"
@@ -283,52 +283,49 @@
         <a href="{{ url_for('comuns.logout') }}" class="btn-sair">Sair</a>
       </div>
 
-       {# --- MODAL: só quando estiver na aba Pendente --- #}
-          {% if status == 'pendente' %}
-            <div id="modal-mover-todos" class="modal-overlay" style="display:none;">
-              <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="titulo-mover">
-                <h3 id="titulo-mover">Mover todos os recados pendentes para:</h3>
+        {# --- MODAL: --- #}
+        {% if status in ['pendente', 'respondido'] %}
+          <div id="modal-mover-todos" class="modal-overlay" style="display:none;">
+            <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="titulo-mover">
+              <h3 id="titulo-mover">
+                Mover todos os recados {{ status.replace('_',' ') }} para:
+              </h3>
 
-                <form method="POST" action="{{ url_for('responsavel.mover_todos') }}" id="form-mover-todos">
-                  {# Se usar Flask-WTF/CSRF, descomente:
-                  <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
-                  #}
+              <form method="POST" action="{{ url_for('responsavel.mover_todos') }}" id="form-mover-todos">
+                <!-- mantém o contexto -->
+                <input type="hidden" name="de_status" value="{{ status }}">
+                <input type="hidden" name="busca" value="{{ request.args.get('busca','') }}">
 
+                {# >>> EXCLUSIVO POR STATUS <<< #}
+                {% if status == 'pendente' %}
                   <div class="opcoes">
                     <label class="radio-opcao">
                       <input type="radio" name="para_status" value="imprimir" required>
                       <span>Imprimir</span>
                     </label>
-
                     <label class="radio-opcao">
-                      <input type="radio" name="para_status" value="solicitado_ao_medico" required>
+                      <input type="radio" name="para_status" value="solicitado_ao_medico">
                       <span>Solicitado</span>
                     </label>
                   </div>
 
-                  <div class="acoes">
-                    <button type="button" class="btn" id="cancelar-mover">Cancelar</button>
-                    <button type="submit" class="btn btn-primario" id="confirmar-mover">Confirmar</button>
+                {% elif status == 'respondido' %}
+                  <div class="opcoes">
+                    <label class="radio-opcao">
+                      <input type="radio" name="para_status" value="entregue" required>
+                      <span>Entregue</span>
+                    </label>
                   </div>
-                </form>
-              </div>
+                {% endif %}
+
+                <div class="acoes">
+                  <button type="button" class="btn" id="cancelar-mover">Cancelar</button>
+                  <button type="submit" class="btn btn-primario" id="confirmar-mover">Confirmar</button>
+                </div>
+              </form>
             </div>
-          {% endif %}
-        {# --- FIM DO MODAL --- #}
-      <script>
-        const acc = document.getElementsByClassName("accordion");
-        for (let i = 0; i < acc.length; i++) {
-          acc[i].addEventListener("click", function () {
-            this.classList.toggle("active");
-            const panel = this.nextElementSibling;
-            if (panel.style.display === "block") {
-              panel.style.display = "none";
-            } else {
-              panel.style.display = "block";
-            }
-          });
-        }
-      </script>
+          </div>
+        {% endif %}
     </div>
     {% with mensagens = get_flashed_messages(with_categories=true) %} {% if
     mensagens %}
@@ -355,74 +352,86 @@
     </script>
     <script>
       document.addEventListener('DOMContentLoaded', function () {
-        var btn = document.getElementById('btn-mover-todos');
-        var modal = document.getElementById('modal-mover-todos');
-        var cancelar = document.getElementById('cancelar-mover');
-        var confirmar = document.getElementById('confirmar-mover');
-        var form = document.getElementById('form-mover-todos');
+        /** ===== Modal "Mover todos" ===== */
+        const btnMover   = document.getElementById('btn-mover-todos');
+        const modal      = document.getElementById('modal-mover-todos');
+        const cancelar   = document.getElementById('cancelar-mover');
+        const confirmar  = document.getElementById('confirmar-mover');
+        const form       = document.getElementById('form-mover-todos');
 
         function abrirModal() {
+          if (!modal) return;
           modal.style.display = 'flex';
-          var firstRadio = modal.querySelector('input[type="radio"]');
+          const firstRadio = modal.querySelector('input[type="radio"]');
           if (firstRadio) firstRadio.focus();
-          document.addEventListener('keydown', escHandler);
+          document.addEventListener('keydown', escHandlerModal);
         }
-
         function fecharModal() {
+          if (!modal) return;
           modal.style.display = 'none';
-          document.removeEventListener('keydown', escHandler);
+          document.removeEventListener('keydown', escHandlerModal);
         }
-        // [N O V O] Dropdown "Alterar Status" por clique
-        const dropdowns = document.querySelectorAll('.dropdown');
-
-        function fecharTodosDropdowns() {
-          dropdowns.forEach(d => d.classList.remove('open'));
+        function escHandlerModal(e) {
+          if (e.key === 'Escape' && modal.style.display === 'flex') fecharModal();
         }
 
-        dropdowns.forEach(d => {
-          const btn = d.querySelector('.dropbtn');
-          if (!btn) return;
-
-          btn.addEventListener('click', function (e) {
-            e.stopPropagation();                 // não propaga para o document
-            const jaAberto = d.classList.contains('open');
-            fecharTodosDropdowns();              // fecha os outros
-            if (!jaAberto) d.classList.add('open');
-          });
-        });
-
-        // fecha ao clicar fora
-        document.addEventListener('click', fecharTodosDropdowns);
-
-        // fecha com ESC
-        document.addEventListener('keydown', function (e) {
-          if (e.key === 'Escape') fecharTodosDropdowns();
-        });
-        function escHandler(e) {
-          if (e.key === 'Escape' && modal.style.display === 'flex') {
-            fecharModal();
-          }
-        }
-
-        if (btn && modal) {
-          btn.addEventListener('click', abrirModal);
-        }
-        if (cancelar && modal) {
-          cancelar.addEventListener('click', fecharModal);
-        }
+        if (btnMover && modal) btnMover.addEventListener('click', abrirModal);
+        if (cancelar && modal)  cancelar.addEventListener('click', fecharModal);
         if (modal) {
-          modal.addEventListener('click', function (e) {
-            if (e.target === modal) fecharModal();
-          });
+          modal.addEventListener('click', (e) => { if (e.target === modal) fecharModal(); });
         }
         if (form) {
-          form.addEventListener('submit', function () {
-            if (confirmar) {
-              confirmar.disabled = true;
-              confirmar.innerText = 'Movendo...';
-            }
+          form.addEventListener('submit', () => {
+            if (confirmar) { confirmar.disabled = true; confirmar.innerText = 'Movendo...'; }
           });
         }
+
+        /** ===== Dropdown "Alterar Status" ===== */
+        const dropdowns = document.querySelectorAll('.dropdown');
+        function fecharTodosDropdowns() { dropdowns.forEach(d => d.classList.remove('open')); }
+
+        dropdowns.forEach(d => {
+          const botao = d.querySelector('.dropbtn');
+          if (!botao) return;
+          botao.addEventListener('click', (e) => {
+            e.stopPropagation();
+            const aberto = d.classList.contains('open');
+            fecharTodosDropdowns();
+            if (!aberto) d.classList.add('open');
+          });
+        });
+        document.addEventListener('click', fecharTodosDropdowns);
+        document.addEventListener('keydown', (e) => { if (e.key === 'Escape') fecharTodosDropdowns(); });
+
+        /** ===== Acordeões por médico (multi-abertos) ===== */
+        const accordions = document.querySelectorAll('.accordion');
+        const panels     = document.querySelectorAll('.panel');
+
+        // começa tudo fechado
+        panels.forEach(p => p.style.display = 'none');
+        accordions.forEach(a => {
+          a.classList.remove('active');
+          a.setAttribute('aria-expanded', 'false');
+
+          const panel = a.nextElementSibling;
+          if (panel && !a.hasAttribute('aria-controls')) {
+            const id = panel.id || `panel-${Math.random().toString(36).slice(2)}`;
+            panel.id = id;
+            a.setAttribute('aria-controls', id);
+          }
+          if (panel && !panel.hasAttribute('role')) {
+            panel.setAttribute('role', 'region');
+            panel.setAttribute('aria-labelledby', a.id || (a.id = `acc-${Math.random().toString(36).slice(2)}`));
+          }
+
+          // alterna SOMENTE este bloco (não fecha os outros)
+          a.addEventListener('click', () => {
+            const isOpen = panel.style.display === 'block';
+            panel.style.display = isOpen ? 'none' : 'block';
+            a.classList.toggle('active', !isOpen);
+            a.setAttribute('aria-expanded', String(!isOpen));
+          });
+        });
       });
     </script>
   </body>

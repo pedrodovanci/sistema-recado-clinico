@@ -1,34 +1,45 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-    <meta charset="UTF-8">
-    <title>Login</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;500&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
+  <meta charset="UTF-8" />
+  <title>Login</title>
 
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/login.css') }}">
 </head>
-<body>
-    <div class="container">
-        <h1>Login</h1>
-        <form method="post">
-            <label for="username">Usuário:</label>
-            <input type="text" name="username" required>
+<body class="fundo">
+  <div class="container">
 
-            <label for="senha">Senha:</label>
-            <input type="password" name="senha" required>
-
-            <button type="submit">Entrar</button>
-        </form>
-
-        {% with messages = get_flashed_messages(with_categories=true) %}
-          {% if messages %}
-            <ul>
-              {% for category, message in messages %}
-                <li>{{ message }}</li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        {% endwith %}
+    <!-- Logo acima do título -->
+    <div class="logo-login" aria-hidden="true">
+      <img
+        src="{{ url_for('static', filename='/logo_pequeno.png') }}?v=1"
+        alt="Logo da clínica"
+        loading="lazy"
+      >
     </div>
+
+    <h1>Login</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash {{ category|lower }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" class="form">
+      <label for="username">Usuário</label>
+      <input id="username" name="username" type="text" autocomplete="username" required>
+
+      <label for="senha">Senha</label>
+      <input id="senha" name="senha" type="password" autocomplete="current-password" required>
+
+      <button type="submit" class="btn-entrar">Entrar</button>
+    </form>
+  </div>
 </body>
 </html>

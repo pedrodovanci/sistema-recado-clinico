@@ -15,15 +15,31 @@
                 <label>Médico:</label>
                 <select name="medico" required>
                     {% set lista_medicos = [
-                        "Dr. Andre Salotto Rocha", "Dr. Fabiano Morais Nogueira", 
-                        "Dr. Mario Jose Goes", "Dr. Dionei Freitas de Morais", 
-                        "Dr. Felipe Oliveira Rodrigues", "Dra. Raysa Moreira Aprigio", 
-                        "Dr. Eduardo Carlos da Silva", "Dr. Lucas Crociati Meguins", 
-                        "Dr. Sergio Luiz Ramin", "Dr. Carlos Rocha", "Dr. Luis Fernando", 
-                        "Dr. Linoel Curado Valsechi", "Dr. Ricardo Lourenço Caramanti", 
-                        "Dr. Alexandre Laranjeira Junior", "Dr. Caique Alberto Dosualdo", 
-                        "Dr. Demosthenes Santana", "Dr. Matheus Laurenti", "Dr. Sebastiao Silva", 
-                        "Dr. Vinicius Reis", "Dr. Guilherme Perassa Gasque","Dr. Antonio Carlos Pirolla Filho","Dra. Gyovana Campanari","Dr. Luis Guilherme Ronchi","Dr. Rodolfo Vieira Fontenele","Dr. Fernando Filipe"
+                        "Dr. Alexandre Laranjeira Junior",   
+                        "Dr. Andre Salotto Rocha",         
+                        "Dr. Antonio Carlos Pirolla Filho",  
+                        "Dr. Caique Alberto Dosualdo",      
+                        "Dr. Carlos Rocha",                 
+                        "Dr. Demosthenes Santana",          
+                        "Dr. Dionei Freitas de Morais",     
+                        "Dr. Eduardo Carlos da Silva",      
+                        "Dr. Fabiano Morais Nogueira",      
+                        "Dr. Felipe Oliveira Rodrigues",    
+                        "Dr. Fernando Filipe",               
+                        "Dr. Guilherme Perassa Gasque",      
+                        "Dra. Gyovana Campanari",           
+                        "Dr. Linoel Curado Valsechi",       
+                        "Dr. Lucas Crociati Meguins",        
+                        "Dr. Luis Fernando",                
+                        "Dr. Luis Guilherme Ronchi",        
+                        "Dr. Mario Jose Goes",              
+                        "Dr. Matheus Laurenti",              
+                        "Dra. Raysa Moreira Aprigio",       
+                        "Dr. Ricardo Lourenço Caramanti",    
+                        "Dr. Rodolfo Vieira Fontenele",     
+                        "Dr. Sebastiao Silva",              
+                        "Dr. Sergio Luiz Ramin",             
+                        "Dr. Vinicius Reis"                
                     ] %}
                     {% for nome in lista_medicos %}
                         <option value="{{ nome }}" {% if nome == recado.medico %}selected{% endif %}>{{ nome }}</option>

@@ -1,254 +1,225 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8">
   <title>Entregar Recado</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/entregar_recado.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/listar.css') }}">
+
   <style>
-    /* --- Ajustes leves para deixar moderno sem depender de novo CSS --- */
-    body.fundo {
-      background: #d9cbb1 url("{{ url_for('static', filename='img/Fundo_typeform.jpg') }}") no-repeat center top / cover fixed;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, "Noto Sans", "Liberation Sans", sans-serif;
-      color: #1f2937;
+    /* faixa do status (centralizada) */
+    :root { --container-alpha: .85; }
+    .container {
+      background: rgba(255, 255, 255, var(--container-alpha)) !important;
+      max-width: 95%;
+      margin: 50px auto;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
-    .topbar {
-      display:flex; align-items:center; justify-content:center; gap:.75rem;
-      padding: 18px 14px;
+    .secao-status{
+      margin:24px 0 8px; padding:8px 12px; border-radius:10px;
+      color:#fff; font-weight:700; display:flex; align-items:center;
+      justify-content:center; gap:10px; text-align:center;
+      box-shadow:0 2px 6px rgba(0,0,0,.08);
     }
-    .topbar a.btn-voltar {
-      text-decoration:none; background:#111827; color:#fff; border-radius:10px;
-      padding: 10px 16px; font-weight:600; box-shadow: 0 2px 6px rgba(0,0,0,.12);
+    .secao-status .badge-contador{
+      background: rgba(255,255,255,.25); color:#fff;
+      padding:2px 10px; border-radius:999px; font-size:.9rem;
     }
-    .wrapper {
-      max-width: 1100px; margin: 0 auto 56px; background: #ffffffef;
-      border-radius: 14px; padding: 28px; box-shadow: 0 8px 30px rgba(0,0,0,.08);
-      border: 1px solid #ececec;
-    }
-    h1.title {
-      text-align:center; font-size: 28px; margin: 4px 0 18px 0; color:#111827;
-    }
+    .secao-status.pendente             { background:#f1c40f; color:#2c3e50; }
+    .secao-status.imprimir             { background:#3498db; }
+    .secao-status.solicitado_ao_medico { background:#e67e22; }
+    .secao-status.respondido           { background:#2ecc71; }
+    .secao-status.passar_cartao        { background:#9b59b6; }
+    .secao-status.so_entregar          { background:#1abc9c; }
+    .secao-status.alto_custo           { background:#e74c3c; }
+    .secao-status.entregue             { background:#7f8c8d; }
 
-    /* Busca central moderna */
-    form.busca {
-      display:flex; justify-content:center; align-items:center; gap:.5rem; margin: 10px 0 22px;
+    /* cabeçalho do médico */
+    .faixa-medico{
+      display:flex; align-items:center; justify-content:space-between;
+      color:#fff; font-weight:600; padding:10px 14px; border-radius:8px;
+      margin:14px 0 6px 0; box-shadow:0 2px 6px rgba(0,0,0,.12);
+      cursor:pointer; user-select:none;  
     }
-    .search-wrap {
-      position: relative; width: min(720px, 88vw);
+    .faixa-medico .caret{                              /* setinha gira ao abrir */
+      margin-left:8px; font-weight:900; opacity:.85; transition: transform .2s;
     }
-    .search-wrap input[type="text"]{
-      width:100%; padding: 14px 44px 14px 16px; border: 1px solid #e5e7eb; outline: none;
-      border-radius: 999px; background:#fff; font-size:15px;
-      box-shadow: inset 0 1px 0 rgba(0,0,0,.03), 0 2px 10px rgba(0,0,0,.04);
+    .faixa-medico .badge-contador{
+      background: rgba(255,255,255,.2);
+      color:#fff; padding:2px 8px; border-radius:999px; font-size:.85rem;
     }
-    .search-wrap button {
-      position:absolute; top:50%; right:6px; transform:translateY(-50%);
-      border:none; background:#2563eb; color:#fff; border-radius: 999px; width:36px; height:36px; cursor:pointer;
-      display:flex; align-items:center; justify-content:center; font-weight:700;
-      box-shadow: 0 2px 10px rgba(37,99,235,.35);
-    }
-    .search-wrap button:hover { filter: brightness(.95); }
+    .faixa-medico[aria-expanded="true"] .caret{ transform: rotate(90deg); }
+    .table-colapsavel{ display:none; }                 /* começa fechado */
 
-    /* Flash (verde e central, fora do container) */
-    .flash-host {
-      position: fixed; top: 14px; left: 0; right: 0; display:flex; justify-content:center; z-index: 1000; pointer-events:none;
+    /* link do paciente com cara de botão */
+    .btn-paciente{
+      text-decoration:none; padding:6px 10px; border-radius:8px;
+      background: linear-gradient(180deg, rgba(255,255,255,.85), rgba(255,255,255,.6));
+      border:1px solid rgba(0,0,0,.06); display:inline-block;
     }
-    .flash {
-      pointer-events:auto; background:#def7ec; color:#03543f; border:1px solid #84e1bc; border-radius:10px;
-      padding:10px 14px; font-weight:600; box-shadow:0 8px 20px rgba(0,0,0,.08);
-      display:flex; align-items:center; gap:.5rem;
-    }
+    .btn-paciente:hover{ filter:brightness(.98); }
+  </style>
+  <style>
+  /* Tabelas de Entregar Recado – colunas padronizadas */
+  .tabela-entregar{
+    width:100%;
+    border-collapse:separate;
+    border-spacing:0;
+    table-layout: fixed;          /* importante p/ respeitar <col> */
+  }
+  .tabela-entregar th, .tabela-entregar td{
+    padding:10px 12px;
+    vertical-align: middle;
+  }
 
-    /* Médico (accordion simplificado) */
-    .medico-header {
-      margin-top: 22px; border-radius: 10px 10px 0 0; color:#fff; font-weight:700;
-      padding: 10px 14px; display:flex; align-items:center; justify-content:space-between;
-      box-shadow: inset 0 -1px 0 rgba(255,255,255,.28);
-    }
-    .quantia-pill {
-      background: rgba(255,255,255,.22); padding: 2px 8px; border-radius:999px; font-weight:700; font-size: 12px;
-    }
-    .medico-card {
-      border: 1px solid #e5e7eb; border-radius: 0 0 10px 10px; background:#fff;
-      overflow:hidden; box-shadow: 0 6px 20px rgba(0,0,0,.05);
-    }
+  /* Larguras (ajuste se quiser) */
+  .tabela-entregar col.col-paciente  { width: 28%; }
+  .tabela-entregar col.col-telefone  { width: 18%; }
+  .tabela-entregar col.col-data      { width: 14%; }
+  .tabela-entregar col.col-mensagem  { width: 30%; }
+  .tabela-entregar col.col-acao      { width: 10%; }
 
-    table {
-      width:100%; border-collapse: collapse; font-size: 14px;
-    }
-    thead th {
-      background:#f9fafb; color:#111827; text-align:left; padding:10px 12px; border-bottom:1px solid #e5e7eb; font-weight:700;
-    }
-    tbody td {
-      padding:12px; border-bottom:1px solid #f3f4f6; vertical-align: top;
-    }
-    tbody tr:hover td { background:#fbfbfb; }
-    .nome-paciente a {
-      color:#0f172a; text-decoration: none; font-weight:700;
-    }
-    .nome-paciente a:hover { text-decoration: underline; }
-    .status-tag {
-      font-weight:700; background:#f3f4f6; color:#111827; padding:6px 10px; border-radius:999px; display:inline-block;
-    }
-    .acoes .btn-entregar {
-      background:#2563eb; color:#fff; border:none; border-radius:10px; padding:8px 12px; font-weight:700;
-      text-decoration:none; display:inline-block; box-shadow:0 6px 18px rgba(37,99,235,.28);
-    }
-    .acoes .btn-entregar:hover { filter:brightness(.95); }
-
-    .vazio {
-      background:#fff; border: 1px dashed #e5e7eb; padding: 22px; border-radius: 10px; text-align:center; color:#6b7280;
-      margin-top: 12px;
-    }
-
-    @media (max-width: 800px){
-      thead { display:none; }
-      table, tbody, tr, td { display:block; width:100%; }
-      tbody tr { margin-bottom:14px; border:1px solid #eee; border-radius:8px; overflow:hidden; }
-      tbody td { border:none; border-bottom:1px solid #f3f4f6; }
-      tbody td:last-child { border-bottom:none; }
-      tbody td::before {
-        content: attr(data-th);
-        display:block; font-size:12px; color:#6b7280; margin-bottom:4px; text-transform:uppercase; letter-spacing:.02em;
-      }
-    }
-    /* Botão de busca moderno */
-    .campo-busca {
-      display: flex;
-      justify-content: center;
-      gap: 8px;
-      margin: 20px 0;
-    }
-
-    .campo-busca input[type="text"] {
-      flex: 1;
-      max-width: 400px;
-      padding: 12px 16px;
-      border: 1px solid #ccc;
-      border-radius: 30px;
-      outline: none;
-      font-size: 15px;
-      transition: border-color 0.3s, box-shadow 0.3s;
-    }
-
-    .campo-busca input[type="text"]:focus {
-      border-color: #2563eb;
-      box-shadow: 0 0 0 3px rgba(37,99,235,.2);
-    }
-
-    /* Botão redondo com ícone */
-    .campo-busca button {
-      background-color: #2563eb;
-      color: #fff;
-      border: none;
-      border-radius: 50%;
-      width: 46px;
-      height: 46px;
-      font-size: 18px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(37,99,235,.3);
-      transition: background-color 0.25s ease, transform 0.15s ease;
-    }
-
-    .campo-busca button:hover {
-      background-color: #1d4ed8;
-      transform: scale(1.05);
-    }
+  /* Alinhamentos consistentes */
+  .tabela-entregar th:nth-child(2),
+  .tabela-entregar td:nth-child(2),
+  .tabela-entregar th:nth-child(3),
+  .tabela-entregar td:nth-child(3){
+    text-align:center;            /* Telefone e Data */
+  }
+  .tabela-entregar th:nth-child(5),
+  .tabela-entregar td:nth-child(5){
+    text-align:center;            /* Ação */
+  }
 </style>
 </head>
-<body class="fundo">
+<body>
+  <div class="container">
 
-  <!-- FLASH CENTRAL SUPERIOR -->
-  <div class="flash-host">
-    {% with mensagens = get_flashed_messages(with_categories=true) %}
-      {% if mensagens %}
-        {% for categoria, msg in mensagens %}
-          <div class="flash">
-            ✅ {{ msg.replace('_', ' ') }}
-          </div>
-        {% endfor %}
-      {% endif %}
-    {% endwith %}
-  </div>
+    <h1>Digite o nome do paciente para encontrar seu recado</h1>
 
-  <div class="topbar">
-    <a href="{{ url_for('comuns.cadastro_recado') }}" class="btn-voltar">Voltar</a>
-  </div>
-
-  <div class="wrapper">
-    <h1 class="title">Digite o nome do paciente para encontrar seu recado</h1>
-
-    <!-- BUSCA -->
-    <form method="GET" action="{{ url_for('comuns.entregar_recado') }}" class="campo-busca">
-      <input type="text" name="busca" placeholder="Nome do paciente..." value="{{ request.args.get('busca', '') }}" required>
-      <button type="submit">🔍</button>
+    <!-- Busca -->
+    <form class="campo-busca" method="get" action="{{ url_for('comuns.entregar_recado') }}">
+      <input type="hidden" name="status" value="{{ status }}">
+      <input type="text" name="busca" placeholder="Ex.: Maria" value="{{ busca }}">
+      <button type="submit" title="Buscar">&#128269;</button>
     </form>
 
-    <!-- RESULTADOS -->
-    {% if resultados %}
-      {% for medico, recados in resultados.items() %}
-        <!-- topo com a cor do médico -->
-        <div class="medico-header" style="background: {{ cores.get(medico, '#3498db') }}">
-          <div>{{ medico }}</div>
-          <span class="quantia-pill">{{ recados|length }}</span>
-        </div>
+    {% if busca %}
+      <h2 style="margin:16px 0">Resultados para “{{ busca }}”</h2>
+    {% endif %}
 
-        <div class="medico-card">
-          {% if recados %}
-            <table>
+    {% if busca %}
+      {% for st in status_ordem %}
+        {% set lista = resultados_por_status.get(st, []) %}
+        {% if lista and lista|length > 0 %}
+
+          <h3 class="secao-status {{ st }}">
+            {{ labels[st] }}
+            <span class="badge-contador">{{ lista|length }}</span>
+          </h3>
+
+          {# agrupa os recados deste status por médico #}
+          {% for grupo in lista|groupby('medico') %}
+            {% set medico = grupo.grouper or '---' %}
+            {% set itens  = grupo.list %}
+            {% set med_key = (medico|string)|trim|lower %}
+            <div class="faixa-medico"
+              role="button" tabindex="0" aria-expanded="false"
+              style="background-color: {{ cores_lower.get(med_key, '#2C3E50') }};">
+            <span>{{ medico }}</span>
+            <span style="display:flex;align-items:center;gap:10px;">
+              <span class="badge-contador">{{ itens|length }}</span>
+              <span class="caret">▸</span>
+            </span>
+          </div>
+          <table class="tabela-entregar table-colapsavel">
+            <table class="tabela-entregar">
+              <colgroup>
+                <col class="col-paciente">
+                <col class="col-telefone">
+                <col class="col-data">
+                <col class="col-mensagem">
+                <col class="col-acao">
+              </colgroup>
               <thead>
                 <tr>
                   <th>Paciente</th>
                   <th>Telefone</th>
+                  <th>Data</th>
                   <th>Mensagem</th>
-                  <th>Status</th>
-                  <th style="width:120px;">Ação</th>
+                  <th style="text-align:center;">Ação</th>
                 </tr>
               </thead>
               <tbody>
-                {% for r in recados %}
+                {% for r in itens %}
                   <tr>
-                    <td class="nome-paciente" data-th="Paciente">
-                      <a href="{{ url_for('responsavel.detalhar_recado', id=r['id']) }}" title="Ver detalhes">{{ r['nome_paciente'] }}</a>
-                    </td>
-                    <td data-th="Telefone">{{ r['telefone'] or '—' }}</td>
-                    <td data-th="Mensagem">{{ r['descricao'] or '—' }}</td>
-                    <td data-th="Status"><span class="status-tag">{{ r['status'].replace('_', ' ') }}</span></td>
-                    <td class="acoes" data-th="Ação">
-                      <a class="btn-entregar"
-                         href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='entregue') }}"
-                         onclick="return confirm('Confirmar entrega deste recado?');">
-                        Entregar
+                    <td>
+                      <a href="{{ url_for('responsavel.detalhar_recado', id=r['id']) }}"
+                         class="btn-paciente" title="{{ r['nome_paciente'] }}">
+                        {{ r['nome_paciente'] }}
                       </a>
+                    </td>
+                    <td>{{ r['telefone'] }}</td>
+                    <td>{{ r['data_cadastro']|format_data }}</td>
+                    <td><span class="mensagem-preview">{{ r['descricao'] }}</span></td>
+                    <td style="text-align:center;">
+                      <a href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='entregue') }}"
+                         class="btn btn-primario">Entregar</a>
                     </td>
                   </tr>
                 {% endfor %}
               </tbody>
             </table>
-          {% else %}
-            <div class="vazio">Nenhum recado para este médico.</div>
-          {% endif %}
-        </div>
+          </table>    
+          {% endfor %}
+        {% endif %}
       {% endfor %}
-    {% else %}
-      <div class="vazio">Nenhum recado encontrado para sua busca.</div>
-    {% endif %}
-  </div>
 
+      {% if not tem_algum %}
+        <div class="sem-resultados">Nenhum recado encontrado para “{{ busca }}”.</div>
+      {% endif %}
+    {% else %}
+      <div class="sem-resultados">
+        Digite um nome acima para buscar recados e entregá-los.
+      </div>
+    {% endif %}
+  <div class="footer-links" style="margin-top:16px;">
+    {% if perfil == 'atendente' %}
+      <a href="{{ url_for('comuns.inicio') }}" class="btn-sair">← Voltar</a>
+    {% else %}
+      <a href="{{ url_for('responsavel.listar', status=status or 'pendente') }}" class="btn-sair">← Voltar</a>
+    {% endif %}
+</div>    
+</div>
   <script>
-    // Fade-out suave do flash
-    window.addEventListener("load", function () {
-      const flash = document.querySelector(".flash-host");
-      if (!flash) return;
-      setTimeout(() => {
-        flash.style.transition = "opacity 0.9s ease";
-        flash.style.opacity = "0";
-        setTimeout(() => flash.remove(), 900);
-      }, 4200);
+document.addEventListener('DOMContentLoaded', () => {
+  const headers = document.querySelectorAll('.faixa-medico');
+  headers.forEach((h, i) => {
+    const panel = h.nextElementSibling;
+    if (!panel || !panel.classList.contains('table-colapsavel')) return;
+
+    // liga ARIA
+    const pid = panel.id || `panel-med-${i}`;
+    panel.id = pid;
+    h.setAttribute('aria-controls', pid);
+    h.setAttribute('aria-expanded', 'false');
+
+    // começa fechado (garantia)
+    panel.style.display = 'none';
+
+    function toggle() {
+      const abrir = panel.style.display === 'none';
+      panel.style.display = abrir ? 'table' : 'none';   // mantém layout de tabela
+      h.setAttribute('aria-expanded', abrir ? 'true' : 'false');
+    }
+
+    h.addEventListener('click', toggle);
+    h.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
     });
-  </script>
+  });
+});
+</script>
 </body>
 </html>
