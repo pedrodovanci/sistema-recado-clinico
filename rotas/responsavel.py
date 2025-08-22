@@ -199,55 +199,35 @@ def responsavel_routes(conectar_banco, login_requerido):
     @responsavel_bp.route('/mover_todos', methods=['POST'])
     @login_requerido(['responsavel'])
     def mover_todos():
-        de_status   = (request.form.get('de_status') or 'pendente').strip().lower()
+        de_status   = (request.form.get('de_status') or '').strip().lower()
         para_status = (request.form.get('para_status') or '').strip().lower()
-        busca       = (request.form.get('busca') or '').strip()
 
-        # Regras claras por origem
-        destinos_validos_por_origem = {
-            'pendente':   {'imprimir', 'solicitado_ao_medico'},
-            'respondido': {'entregue'},   # 👈 só “Entregue” em Respondido
+        # Transições permitidas (simples e explícitas)
+        transicoes_validas = {
+            'pendente': {'imprimir'},
+            'imprimir': {'solicitado_ao_medico'},
+            'respondido': {'entregue'},
         }
 
-        if de_status not in destinos_validos_por_origem or \
-        para_status not in destinos_validos_por_origem[de_status]:
-            flash('Escolha um status de destino válido para este status.', 'danger')
-            return redirect(url_for('responsavel.listar', status=de_status, busca=busca or None))
+        if de_status not in transicoes_validas or para_status not in transicoes_validas[de_status]:
+            flash('Ação não permitida para este status.', 'danger')
+            return redirect(url_for('responsavel.listar', status=de_status))
 
         conexao = conectar_banco()
-        try:
-            cursor = conexao.cursor()
-
-            # WHERE: de qual status e (opcional) busca por paciente
-            where = ' WHERE status = ?'
-            params_where = [de_status]
-            if busca:
-                where += ' AND nome_paciente LIKE ?'
-                params_where.append(f'%{busca}%')
-
-            if para_status == 'entregue':
-                # Preencher "Entregue por"
-                finalizador = session.get('usuario', '---')
-                sql = f'UPDATE recados SET status = ?, finalizado_por = ?{where}'
-                params = [para_status, finalizador] + params_where
-            
-            elif de_status == 'entregue' and para_status != 'entregue':
-                sql = f'UPDATE recados SET status = ?, finalizado_por = NULL{where}'
-                params = [para_status] + params_where
-            
-            else:
-                sql = f'UPDATE recados SET status = ?{where}'
-                params = [para_status] + params_where
-
-            cursor.execute(sql, params)
-            conexao.commit()
-            movidos = cursor.rowcount or 0
-        finally:
-            conexao.close()
+        cursor = conexao.cursor()
+        cursor.execute("""
+            UPDATE recados
+            SET status = ?
+            WHERE status = ?
+        """, (para_status, de_status))
+        conexao.commit()
+        movidos = cursor.rowcount or 0
+        conexao.close()
 
         flash(f'{movidos} recado(s) movido(s) para "{para_status.replace("_"," ")}".', 'success')
-        return redirect(url_for('responsavel.listar', status=para_status, busca=busca or None))
-    
+        # depois de mover, levar o usuário para o novo status (destino)
+        return redirect(url_for('responsavel.listar', status=para_status))
+        
     return responsavel_bp
 
 def excluir_recados_antigos(conectar_banco):

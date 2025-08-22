@@ -178,6 +178,7 @@ def comuns_routes(conectar_banco, login_requerido):
 
         return render_template(
             'entregar_recado.html',
+            perfil=session.get('perfil'),
             status=status,
             busca=busca,
             status_ordem=status_ordem,
@@ -186,7 +187,7 @@ def comuns_routes(conectar_banco, login_requerido):
             contagem_por_status=contagem_por_status,
             tem_algum=tem_algum,
             cores_lower=cores_lower,
-            perfil=perfil   
+              
         )
 
    

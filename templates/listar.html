@@ -132,7 +132,7 @@
           class="btn-imprimir-status {{ status }}"
           >Todos deste status</a
         >
-        {% if status in ['pendente', 'respondido'] %}
+        {% if status in ['pendente', 'imprimir', 'respondido'] %}
           <button type="button" id="btn-mover-todos" class="btn btn-primario" style="margin-left:8px;">
             Mover todos
           </button>
@@ -194,7 +194,7 @@
               <td>
                 <a
                   href="{{ url_for('responsavel.detalhar_recado', id=r['id']) }}"
-                  class="btn-paciente"
+                  class="btn-paciente coluna-nome"
                   title="{{ r['nome_paciente'] }}"
                 >
                   {{ r['nome_paciente'] }}
@@ -205,7 +205,7 @@
               <td>{{ r['data_cadastro']|format_data }}</td>
 
               <td>
-                <span class="mensagem-preview">{{ r['descricao'] }}</span>
+                <span class="mensagem-preview coluna-mensagem">{{ r['descricao'] }}</span>
               </td>
 
               <td>
@@ -283,8 +283,8 @@
         <a href="{{ url_for('comuns.logout') }}" class="btn-sair">Sair</a>
       </div>
 
-        {# --- MODAL: --- #}
-        {% if status in ['pendente', 'respondido'] %}
+        {# --- MODAL: Mover todos --- #}
+        {% if status in ['pendente', 'imprimir', 'respondido'] %}
           <div id="modal-mover-todos" class="modal-overlay" style="display:none;">
             <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="titulo-mover">
               <h3 id="titulo-mover">
@@ -296,15 +296,19 @@
                 <input type="hidden" name="de_status" value="{{ status }}">
                 <input type="hidden" name="busca" value="{{ request.args.get('busca','') }}">
 
-                {# >>> EXCLUSIVO POR STATUS <<< #}
+                {# opções por status #}
                 {% if status == 'pendente' %}
                   <div class="opcoes">
                     <label class="radio-opcao">
                       <input type="radio" name="para_status" value="imprimir" required>
                       <span>Imprimir</span>
                     </label>
+                  </div>
+
+                {% elif status == 'imprimir' %}
+                  <div class="opcoes">
                     <label class="radio-opcao">
-                      <input type="radio" name="para_status" value="solicitado_ao_medico">
+                      <input type="radio" name="para_status" value="solicitado_ao_medico" required>
                       <span>Solicitado</span>
                     </label>
                   </div>
@@ -339,14 +343,16 @@
       window.addEventListener("load", function () {
         const toasts = document.querySelectorAll(".toast");
         toasts.forEach((toast) => {
-          setTimeout(() => {
-            toast.style.transition = "opacity 1s ease";
-            toast.style.opacity = "0";
+          // fecha ao clicar
+          toast.addEventListener('click', () => toast.remove());
 
-            setTimeout(() => {
-              toast.remove();
-            }, 1000); // após o fade-out
-          }, 5000); // visível por 5 segundos
+          // some sozinho após 5s
+          setTimeout(() => {
+            toast.style.transition = "opacity .4s ease, transform .4s ease";
+            toast.style.opacity = "0";
+            toast.style.transform = "translateY(6px)";
+            setTimeout(() => toast.remove(), 400);
+          }, 5000);
         });
       });
     </script>
@@ -432,6 +438,17 @@
             a.setAttribute('aria-expanded', String(!isOpen));
           });
         });
+      });
+    </script>
+    <script>
+      document.getElementById('btn-mover-todos')?.addEventListener('click', () => {
+        const modal = document.getElementById('modal-mover-todos');
+        if (modal) modal.style.display = 'flex';
+      });
+
+      document.getElementById('cancelar-mover')?.addEventListener('click', () => {
+        const modal = document.getElementById('modal-mover-todos');
+        if (modal) modal.style.display = 'none';
       });
     </script>
   </body>

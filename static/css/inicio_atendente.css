@@ -1,55 +1,89 @@
-body {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    background: url('/static/Fundo_typeform.jpg') no-repeat center center fixed;
-    background-size: cover;
-    margin: 0;
-    font-family: 'Inter', sans-serif;
+:root { --container-alpha: .96; }
+
+/* Centraliza vertical e horizontal */
+.home-wrap{
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  padding: 24px 12px;
 }
 
-.container {
-    background: rgba(255, 255, 255, 0.95);
-    padding: 40px;
-    border-radius: 16px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
-    text-align: center;
-    max-width: 600px;
+/* Card mais estreito, translúcido e com leve blur */
+.card-home{
+  width: 100%;
+  max-width: 440px;                       /* mais estreito */
+  padding: 26px 28px;
+  border-radius: 16px;
+  background: linear-gradient(180deg,
+              rgba(255,255,255,var(--container-alpha)),
+              rgba(244,247,255,var(--container-alpha)));
+  border: 1px solid rgba(28,63,170,.08);
+  box-shadow: 0 10px 30px rgba(0,0,0,.12);
+  text-align: center;
+  backdrop-filter: blur(6px);
 }
 
-h1 {
-    font-size: 32px;
-    margin-bottom: 30px;
-    color: #2c3e50;
+/* Cabeçalho */
+.hello{
+  margin: 0;
+  color: #64748b;                         /* slate-500 */
+  font-size: .95rem;
+}
+.username{
+  margin: 2px 0 12px;
+  font-size: 2rem;                        /* maiorzin */
+  font-weight: 800;
+  color: #0f172a;                         /* slate-900 */
 }
 
-.btn-grupo {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
+/* Botões principais – sem sublinhado, mais cor */
+.actions{
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin: 8px 0 14px;
+}
+a { text-decoration: none; }              /* remove linha de link */
+
+.hbtn{
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 12px 16px;
+  border-radius: 12px;
+  font-weight: 700;
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(0,0,0,.12);
+  transition: transform .08s ease, box-shadow .15s ease, filter .15s ease;
+}
+.hbtn:hover{
+  transform: translateY(-1px);
+  filter: brightness(1.03);
+  box-shadow: 0 10px 22px rgba(0,0,0,.18);
+}
+.hbtn--primary{
+  background: linear-gradient(135deg,#60a5fa,#2563eb);   /* azul */
+}
+.hbtn--secondary{
+  background: linear-gradient(135deg,#c084fc,#7c3aed);   /* roxo */
 }
 
-.btn {
-    padding: 14px 24px;
-    font-size: 18px;
-    background-color: #2c3e50;
-    color: white;
-    border: none;
-    border-radius: 10px;
-    text-decoration: none;
-    transition: background-color 0.3s ease;
-}
-
-.btn:hover {
-    background-color: #1a252f;
-}
-.btn.sair {
+/* Botão “voltar ao login” com cor suave */
+.back-login{
   display: inline-block;
-  margin-top: 20px;
-  background-color: #e74c3c;
+  margin-top: 6px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  background: #fef2f2;
+  color: #b91c1c;                          /* vermelho */
+  box-shadow: 0 2px 8px rgba(0,0,0,.06);
 }
+.back-login:hover{ filter: brightness(1.03); }
 
-.btn.sair:hover {
-  background-color: #c0392b;
+/* Mobile */
+@media (max-width: 480px){
+  .card-home{ max-width: 92%; padding: 22px; }
+  .actions{ flex-direction: column; }
 }

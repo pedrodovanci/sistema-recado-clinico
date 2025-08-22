@@ -1,6 +1,7 @@
 from flask import Flask, session
 from datetime import datetime
 import sqlite3
+import os
 
 from rotas import comuns_routes, responsavel_routes, admin_routes
 
@@ -9,7 +10,9 @@ app.secret_key = 'chave-secreta'
 
 # Banco de dados
 def conectar_banco():
-    conexao = sqlite3.connect('recados.db')
+    # usa var de ambiente RECADOS_DB se existir; senão usa o caminho do servidor
+    caminho = os.getenv("RECADOS_DB", r"C:\sistema_recados\dist\recados.db")
+    conexao = sqlite3.connect(caminho)
     conexao.row_factory = sqlite3.Row
     return conexao
 

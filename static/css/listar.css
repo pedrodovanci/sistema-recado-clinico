@@ -507,3 +507,49 @@ body, button, .btn, a, input, select, textarea{
 
 /* (opcional) quando o botão tiver a classe .active, mostra o painel ao lado */
 .accordion.active + .panel { display: block; }
+/* --- Forçar flashes no canto inferior direito --- */
+body .toast-container{
+  position: fixed !important;
+  right: 24px !important;
+  bottom: 24px !important;
+  left: auto !important;
+  top: auto !important;
+  transform: none !important;
+  z-index: 99999 !important;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  pointer-events: none;
+}
+
+/* Visual unificado dos toasts */
+body .toast{
+  min-width: 320px;
+  max-width: 420px;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: #fff;
+  color: #0f172a;
+  box-shadow: 0 10px 24px rgba(0,0,0,.18);
+  border-left: 6px solid #3b82f6;
+  pointer-events: auto;
+  animation: toast-in .25s ease both;
+}
+body .toast.success { border-left-color: #22c55e; }
+body .toast.danger  { border-left-color: #ef4444; }
+body .toast.warning { border-left-color: #f59e0b; }
+body .toast.info    { border-left-color: #3b82f6; }
+
+@keyframes toast-in {
+  from { transform: translateY(8px); opacity: 0; }
+  to   { transform: translateY(0);   opacity: 1; }
+}
+.coluna-nome,
+.coluna-mensagem {
+  max-width: 220px;        /* largura máxima */
+  white-space: nowrap;     /* não quebra linha */
+  overflow: hidden;        /* esconde excesso */
+  text-overflow: ellipsis; /* adiciona os "..." */
+  display: inline-block;   /* garante o efeito */
+  vertical-align: middle;  /* alinha certinho na célula */
+}

@@ -1,21 +1,31 @@
 <!DOCTYPE html>
 <html lang="pt-br">
 <head>
-  <meta charset="UTF-8">
+  <meta charset="UTF-8" />
   <title>Bem-vindo(a)</title>
+
+  <!-- Reaproveita base (fundo, tipografia, etc.) -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/listar.css') }}">
+  <!-- Estilo específico desta tela -->
   <link rel="stylesheet" href="{{ url_for('static', filename='css/inicio_atendente.css') }}">
 </head>
-<body>
-  <div class="container">
-        <h1>Olá, {{ usuario }}!</h1>
-        <div class="btn-grupo">
-        <a href="{{ url_for('comuns.cadastro_recado') }}" class="btn">+ Novo Recado</a>
-        <a href="{{ url_for('comuns.entregar_recado') }}" class="btn">Entregar Recado</a>
-    </div>
+<body class="fundo">
+  <main class="home-wrap">
+    <section class="card-home">
+      <p class="hello">Bem-vindo(a),</p>
+      <h1 class="username">{{ usuario }}!</h1>
 
-    <br>
+      <div class="actions">
+        <a href="{{ url_for('comuns.cadastro_recado') }}" class="hbtn hbtn--primary">
+          ➕ Novo Recado
+        </a>
+        <a href="{{ url_for('comuns.entregar_recado') }}" class="hbtn hbtn--secondary">
+          📦 Entregar Recado
+        </a>
+      </div>
 
-    <a href="{{ url_for('comuns.logout') }}" class="btn sair">↩ Voltar ao Login</a>
-
+      <a href="{{ url_for('comuns.logout') }}" class="back-login">↩ Voltar ao Login</a>
+    </section>
+  </main>
 </body>
 </html>
