@@ -10,8 +10,8 @@ app.secret_key = 'chave-secreta'
 
 # Banco de dados
 def conectar_banco():
-    # usa var de ambiente RECADOS_DB se existir; senão usa o caminho do servidor
-    caminho = os.getenv("RECADOS_DB", r"C:\sistema_recados\dist\recados.db")
+    # usa var de ambiente RECADOS_DB se existir; senão usa o banco local
+    caminho = os.getenv("RECADOS_DB", "recados.db")
     conexao = sqlite3.connect(caminho)
     conexao.row_factory = sqlite3.Row
     return conexao
@@ -62,12 +62,50 @@ def login_requerido(perfis_permitidos):
     return decorador
 
 
-# Filtro de data
+# Filtros de data
 @app.template_filter('format_data')
 def formatar_data_br(data_str):
+    """Formata data para o padrão brasileiro dd/mm/aaaa"""
+    if not data_str:
+        return ''
     try:
+        # Tenta formato completo com hora
         data_obj = datetime.strptime(data_str, '%Y-%m-%d %H:%M:%S')
         return data_obj.strftime('%d/%m/%Y')
+    except:
+        try:
+            # Tenta formato apenas data
+            data_obj = datetime.strptime(data_str, '%Y-%m-%d')
+            return data_obj.strftime('%d/%m/%Y')
+        except:
+            return data_str
+
+@app.template_filter('format_data_hora')
+def formatar_data_hora_br(data_str):
+    """Formata data e hora para o padrão brasileiro dd/mm/aaaa hh:mm"""
+    if not data_str:
+        return ''
+    try:
+        data_obj = datetime.strptime(data_str, '%Y-%m-%d %H:%M:%S')
+        return data_obj.strftime('%d/%m/%Y %H:%M')
+    except:
+        return data_str
+
+@app.template_filter('strftime')
+def strftime_filter(data_str, formato='%d/%m/%Y'):
+    """Filtro personalizado para formatação de datas"""
+    if not data_str:
+        return ''
+    try:
+        if isinstance(data_str, str):
+            # Tenta diferentes formatos de entrada
+            for fmt in ['%Y-%m-%d', '%Y-%m-%d %H:%M:%S']:
+                try:
+                    data_obj = datetime.strptime(data_str, fmt)
+                    return data_obj.strftime(formato)
+                except:
+                    continue
+        return data_str
     except:
         return data_str
 

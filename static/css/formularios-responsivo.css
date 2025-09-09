@@ -1,0 +1,369 @@
+/* ==============================================
+   RESPONSIVIDADE PARA FORMULÁRIOS EM MONITORES
+   ============================================== */
+
+/* Monitores Ultra Wide (2560px+) */
+@media screen and (min-width: 2560px) {
+  .form-container,
+  .container form {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 40px;
+  }
+  
+  .form-group {
+    margin-bottom: 25px;
+  }
+  
+  .form-group label {
+    font-size: 1.2rem;
+    margin-bottom: 8px;
+    display: block;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 1.1rem;
+    padding: 15px 20px;
+    width: 100%;
+    border: 2px solid #e5e7eb;
+    border-radius: 10px;
+  }
+  
+  .form-group textarea {
+    min-height: 150px;
+    resize: vertical;
+  }
+  
+  .btn-submit,
+  .btn-primario {
+    font-size: 1.2rem;
+    padding: 15px 30px;
+    margin: 10px 5px;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+  }
+}
+
+/* Monitores Full HD e QHD (1920px - 2559px) */
+@media screen and (min-width: 1920px) and (max-width: 2559px) {
+  .form-container,
+  .container form {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 35px;
+  }
+  
+  .form-group {
+    margin-bottom: 22px;
+  }
+  
+  .form-group label {
+    font-size: 1.1rem;
+    margin-bottom: 7px;
+    display: block;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 1.05rem;
+    padding: 12px 18px;
+    width: 100%;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+  }
+  
+  .form-group textarea {
+    min-height: 130px;
+    resize: vertical;
+  }
+  
+  .btn-submit,
+  .btn-primario {
+    font-size: 1.1rem;
+    padding: 12px 25px;
+    margin: 8px 4px;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+  }
+}
+
+/* Monitores HD+ (1600px - 1919px) */
+@media screen and (min-width: 1600px) and (max-width: 1919px) {
+  .form-container,
+  .container form {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 30px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  .form-group label {
+    font-size: 1.05rem;
+    margin-bottom: 6px;
+    display: block;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 1rem;
+    padding: 11px 16px;
+    width: 100%;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+  }
+  
+  .form-group textarea {
+    min-height: 120px;
+    resize: vertical;
+  }
+  
+  .btn-submit,
+  .btn-primario {
+    font-size: 1.05rem;
+    padding: 11px 22px;
+    margin: 7px 3px;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+}
+
+/* Monitores HD (1366px - 1599px) */
+@media screen and (min-width: 1366px) and (max-width: 1599px) {
+  .form-container,
+  .container form {
+    max-width: 550px;
+    margin: 0 auto;
+    padding: 25px;
+  }
+  
+  .form-group {
+    margin-bottom: 18px;
+  }
+  
+  .form-group label {
+    font-size: 1rem;
+    margin-bottom: 5px;
+    display: block;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 0.95rem;
+    padding: 10px 14px;
+    width: 100%;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+  }
+  
+  .form-group textarea {
+    min-height: 110px;
+    resize: vertical;
+  }
+  
+  .btn-submit,
+  .btn-primario {
+    font-size: 1rem;
+    padding: 10px 20px;
+    margin: 6px 3px;
+  }
+  
+  .form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px;
+  }
+}
+
+/* Monitores menores (1024px - 1365px) */
+@media screen and (min-width: 1024px) and (max-width: 1365px) {
+  .form-container,
+  .container form {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  
+  .form-group {
+    margin-bottom: 16px;
+  }
+  
+  .form-group label {
+    font-size: 0.95rem;
+    margin-bottom: 4px;
+    display: block;
+  }
+  
+  .form-group input,
+  .form-group select,
+  .form-group textarea {
+    font-size: 0.9rem;
+    padding: 9px 12px;
+    width: 100%;
+    border: 2px solid #e5e7eb;
+    border-radius: 6px;
+  }
+  
+  .form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+  }
+  
+  .btn-submit,
+  .btn-primario {
+    font-size: 0.95rem;
+    padding: 9px 18px;
+    margin: 5px 2px;
+  }
+  
+  .form-row {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+}
+
+/* Ajustes gerais para formulários em monitores */
+@media screen and (min-width: 1024px) {
+  /* Melhorar foco nos campos */
+  .form-group input:focus,
+  .form-group select:focus,
+  .form-group textarea:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  }
+  
+  /* Melhorar validação visual */
+  .form-group input.error,
+  .form-group select.error,
+  .form-group textarea.error {
+    border-color: #ef4444;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+  }
+  
+  .form-group input.success,
+  .form-group select.success,
+  .form-group textarea.success {
+    border-color: #10b981;
+    box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+  }
+  
+  /* Melhorar botões */
+  .btn-submit:hover,
+  .btn-primario:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  }
+  
+  .btn-submit:active,
+  .btn-primario:active {
+    transform: translateY(0);
+  }
+  
+  /* Melhorar mensagens de erro */
+  .error-message {
+    color: #ef4444;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    display: block;
+  }
+  
+  .success-message {
+    color: #10b981;
+    font-size: 0.9rem;
+    margin-top: 5px;
+    display: block;
+  }
+  
+  /* Otimizar campos obrigatórios */
+  .form-group label.required::after {
+    content: ' *';
+    color: #ef4444;
+    font-weight: bold;
+  }
+  
+  /* Melhorar layout de checkboxes e radios */
+  .form-group.checkbox,
+  .form-group.radio {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .form-group.checkbox input,
+  .form-group.radio input {
+    width: auto;
+    margin: 0;
+  }
+  
+  /* Otimizar grupos de botões */
+  .button-group {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 30px;
+    flex-wrap: wrap;
+  }
+  
+  /* Melhorar campos de data */
+  .form-group input[type="date"],
+  .form-group input[type="datetime-local"] {
+    cursor: pointer;
+  }
+  
+  /* Otimizar selects */
+  .form-group select {
+    cursor: pointer;
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 4 5"><path fill="%23666" d="M2 0L0 2h4zm0 5L0 3h4z"/></svg>');
+    background-repeat: no-repeat;
+    background-position: right 12px center;
+    background-size: 12px;
+    padding-right: 40px;
+  }
+}
+
+/* Ajustes específicos para monitores ultrawide */
+@media screen and (min-width: 2560px) {
+  .form-container,
+  .container form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px;
+    max-width: 1200px;
+  }
+  
+  .form-section {
+    background: rgba(255, 255, 255, 0.05);
+    padding: 30px;
+    border-radius: 12px;
+  }
+  
+  .form-section h3 {
+    margin-top: 0;
+    margin-bottom: 25px;
+    font-size: 1.3rem;
+    color: #1f2937;
+    border-bottom: 2px solid #e5e7eb;
+    padding-bottom: 10px;
+  }
+}

@@ -68,11 +68,26 @@ def comuns_routes(conectar_banco, login_requerido):
     @comuns.route('/salvar', methods=['POST'])
     @login_requerido(['atendente', 'responsavel'])
     def salvar():
+        # Converter data de nascimento do formato brasileiro para formato do banco
+        data_nascimento_input = request.form['data_nascimento']
+        try:
+            # Tentar converter de dd/mm/aaaa para aaaa-mm-dd
+            data_obj = datetime.strptime(data_nascimento_input, '%d/%m/%Y')
+            data_nascimento_db = data_obj.strftime('%Y-%m-%d')
+        except ValueError:
+            # Se falhar, tentar formato original (aaaa-mm-dd)
+            try:
+                data_obj = datetime.strptime(data_nascimento_input, '%Y-%m-%d')
+                data_nascimento_db = data_nascimento_input
+            except ValueError:
+                flash('Formato de data inválido. Use dd/mm/aaaa', 'danger')
+                return redirect(url_for('comuns.cadastro_recado'))
+        
         dados = (
             request.form['medico'],
             request.form['prioridade'],
             request.form['nome_paciente'],
-            request.form['data_nascimento'],
+            data_nascimento_db,
             request.form['telefone'],
             request.form['convenio'],
             request.form['descricao'],

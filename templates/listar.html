@@ -8,6 +8,14 @@
       rel="stylesheet"
       href="{{ url_for('static', filename='css/listar.css') }}"
     />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/responsivo-desktop.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/emoji-buttons.css') }}"
+    />
   </head>
   <body class="fundo">
     <form action="{{ url_for('responsavel.listar') }}" method="get" class="campo-busca">
@@ -18,14 +26,13 @@
         value="{{ request.args.get('busca', '') }}"
       />
       <input type="hidden" name="status" value="{{ status }}" />
-      <button type="submit">🔍</button>
+      <button type="submit" class="btn-search">🔍</button>
     </form>
 
     <div class="container">
       <h1>Recados</h1>
       <h2>
-        Status: {% if status == 'entregue' %}Entregue {% else %}{{
-        status.replace('_', ' ')|capitalize }} {% endif %}
+        Status: {% if status == 'entregue' %}Entregue {% else %}{{ status.replace('_', ' ')|capitalize }}{% endif %}
       </h2>
 
       <div class="menu">
@@ -210,8 +217,7 @@
 
               <td>
                 <span class="status {{ r['status']|replace(' ', '_') }}">
-                  {% if r['status'] == 'entregue' %} Entregue {% else %} {{
-                  r['status'].replace('_', ' ') }} {% endif %}
+                  {% if r['status'] == 'entregue' %}Entregue{% else %}{{ r['status'].replace('_', ' ') }}{% endif %}
                 </span>
               </td>
               <td>
@@ -338,7 +344,8 @@
       <div class="toast {{ categoria }}">✅ {{ msg.replace('_', ' ') }}</div>
       {% endfor %}
     </div>
-    {% endif %} {% endwith %}
+    {% endif %}
+  {% endwith %}
     <script>
       window.addEventListener("load", function () {
         const toasts = document.querySelectorAll(".toast");
@@ -438,17 +445,6 @@
             a.setAttribute('aria-expanded', String(!isOpen));
           });
         });
-      });
-    </script>
-    <script>
-      document.getElementById('btn-mover-todos')?.addEventListener('click', () => {
-        const modal = document.getElementById('modal-mover-todos');
-        if (modal) modal.style.display = 'flex';
-      });
-
-      document.getElementById('cancelar-mover')?.addEventListener('click', () => {
-        const modal = document.getElementById('modal-mover-todos');
-        if (modal) modal.style.display = 'none';
       });
     </script>
   </body>

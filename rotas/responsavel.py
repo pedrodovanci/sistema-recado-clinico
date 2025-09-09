@@ -104,16 +104,34 @@ def responsavel_routes(conectar_banco, login_requerido):
         recado = cursor.fetchone()
 
         if request.method == 'POST':
+            # Converter data de nascimento do formato brasileiro para formato do banco
+            data_nascimento_input = request.form['data_nascimento']
+            try:
+                # Tentar converter de dd/mm/aaaa para aaaa-mm-dd
+                data_obj = datetime.strptime(data_nascimento_input, '%d/%m/%Y')
+                data_nascimento_db = data_obj.strftime('%Y-%m-%d')
+            except ValueError:
+                # Se falhar, tentar formato original (aaaa-mm-dd)
+                try:
+                    data_obj = datetime.strptime(data_nascimento_input, '%Y-%m-%d')
+                    data_nascimento_db = data_nascimento_input
+                except ValueError:
+                    flash('Formato de data inválido. Use dd/mm/aaaa', 'danger')
+                    conexao.close()
+                    return redirect(url_for('responsavel.editar_recado', id=id))
+            
             cursor.execute('''
-                UPDATE recados SET medico = ?, nome_paciente = ?, telefone = ?, status = ?, prioridade = ?, descricao = ?
+                UPDATE recados SET medico = ?, nome_paciente = ?, data_nascimento = ?, telefone = ?, status = ?, prioridade = ?, descricao = ?, convenio = ?
                 WHERE id = ?
             ''', (
                 request.form['medico'],
                 request.form['nome_paciente'],
+                data_nascimento_db,
                 request.form['telefone'],
                 request.form['status'],
                 request.form['prioridade'],
-                request.form['mensagem'],
+                request.form['descricao'],
+                request.form.get('convenio', ''),
                 id
             ))
             conexao.commit()

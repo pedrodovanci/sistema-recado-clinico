@@ -3,76 +3,106 @@
 <head>
     <meta charset="UTF-8">
     <title>Editar Recado</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/editar.css') }}">
-
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo-desktop.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/formularios-responsivo.css') }}">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
 </head>
-<body class="fundo">
-    <div class="imagem_fundo">
-        <div class="container">
-            <h2>Editar Recado</h2>
-            <form method="POST">
-                <label>Médico:</label>
-                <select name="medico" required>
-                    {% set lista_medicos = [
-                        "Dr. Alexandre Laranjeira Junior",   
-                        "Dr. Andre Salotto Rocha",         
-                        "Dr. Antonio Carlos Pirolla Filho",  
-                        "Dr. Caique Alberto Dosualdo",      
-                        "Dr. Carlos Rocha",                 
-                        "Dr. Demosthenes Santana",          
-                        "Dr. Dionei Freitas de Morais",     
-                        "Dr. Eduardo Carlos da Silva",      
-                        "Dr. Fabiano Morais Nogueira",      
-                        "Dr. Felipe Oliveira Rodrigues",    
-                        "Dr. Fernando Filipe",               
-                        "Dr. Guilherme Perassa Gasque",      
-                        "Dra. Gyovana Campanari",           
-                        "Dr. Linoel Curado Valsechi",       
-                        "Dr. Lucas Crociati Meguins",        
-                        "Dr. Luis Fernando",                
-                        "Dr. Luis Guilherme Ronchi",        
-                        "Dr. Mario Jose Goes",              
-                        "Dr. Matheus Laurenti",              
-                        "Dra. Raysa Moreira Aprigio",       
-                        "Dr. Ricardo Lourenço Caramanti",    
-                        "Dr. Rodolfo Vieira Fontenele",     
-                        "Dr. Sebastiao Silva",              
-                        "Dr. Sergio Luiz Ramin",             
-                        "Dr. Vinicius Reis"                
-                    ] %}
-                    {% for nome in lista_medicos %}
-                        <option value="{{ nome }}" {% if nome == recado.medico %}selected{% endif %}>{{ nome }}</option>
-                    {% endfor %}
-                </select>
+<body>
+    <div class="container cadastro">
+        <p class="boas-vindas">Bem-vindo, {{ session.get('usuario', 'Usuário') }}!</p>
+        <div class="links">
+            <a href="{{ url_for('comuns.logout') }}">Sair</a>
+            <a href="{{ url_for('responsavel.listar') }}">Ir para Listagem</a>
+        </div>
 
-                <label>Nome do Paciente:</label>
-                <input type="text" name="nome_paciente" value="{{ recado['nome_paciente'] }}" required>
+        <h1 class="boas-vindas">Editar Recado</h1>
+        <form method="POST">
+            <label>Médico:</label>
+            <select name="medico" required>
+                {% set lista_medicos = [
+                    "Dr. Alexandre Laranjeira Junior",   
+                    "Dr. Andre Salotto Rocha",         
+                    "Dr. Antonio Carlos Pirolla Filho",  
+                    "Dr. Caique Alberto Dosualdo",      
+                    "Dr. Carlos Rocha",                 
+                    "Dr. Demosthenes Santana",          
+                    "Dr. Dionei Freitas de Morais",     
+                    "Dr. Eduardo Carlos da Silva",      
+                    "Dr. Fabiano Morais Nogueira",      
+                    "Dr. Felipe Oliveira Rodrigues",    
+                    "Dr. Fernando Filipe",               
+                    "Dr. Guilherme Perassa Gasque",      
+                    "Dra. Gyovana Campanari",           
+                    "Dr. Linoel Curado Valsechi",       
+                    "Dr. Lucas Crociati Meguins",        
+                    "Dr. Luis Fernando",                
+                    "Dr. Luis Guilherme Ronchi",        
+                    "Dr. Mario Jose Goes",              
+                    "Dr. Matheus Laurenti",              
+                    "Dra. Raysa Moreira Aprigio",       
+                    "Dr. Ricardo Lourenço Caramanti",    
+                    "Dr. Rodolfo Vieira Fontenele",     
+                    "Dr. Sebastiao Silva",              
+                    "Dr. Sergio Luiz Ramin",             
+                    "Dr. Vinicius Reis"                
+                ] %}
+                {% for nome in lista_medicos %}
+                    <option value="{{ nome }}" {% if nome == recado['medico'] %}selected{% endif %}>{{ nome }}</option>
+                {% endfor %}
+            </select>
+            
+            <label>Prioridade:</label>
+            <select name="prioridade" required>
+                <option value="Urgência - até 24 horas" {% if recado['prioridade'] == 'Urgência - até 24 horas' %}selected{% endif %}>Urgência - até 24 horas</option>
+                <option value="Urgência eletiva - até 3 dias" {% if recado['prioridade'] == 'Urgência eletiva - até 3 dias' %}selected{% endif %}>Urgência eletiva - até 3 dias</option>
+                <option value="Eletiva" {% if recado['prioridade'] == 'Eletiva' %}selected{% endif %}>Eletiva</option>
+            </select>
 
-                <label>Telefone:</label>
-                <input type="text" name="telefone" value="{{ recado.telefone }}" required>
+            <label>Nome do Paciente:</label>
+            <input type="text" name="nome_paciente" value="{{ recado['nome_paciente'] }}" required>
 
-                <label>Status:</label>
-                <select name="status" required>
-                    <option value="pendente" {% if recado.status == 'pendente' %}selected{% endif %}>Pendente</option>
-                    <option value="imprimir" {% if recado.status == 'imprimir' %}selected{% endif %}>Imprimir</option>
-                    <option value="concluido" {% if recado.status == 'concluido' %}selected{% endif %}>Concluído</option>
-                </select>
+            <label>Data de Nascimento:</label>
+            <input type="text" id="data_nascimento" name="data_nascimento" value="{{ recado['data_nascimento']|strftime('%d/%m/%Y') }}" placeholder="dd/mm/aaaa" required>
 
-                <label>Prioridade:</label>
-                <select name="prioridade" required>
-                    <option value="Urgência - até 24 horas" {% if recado.prioridade == 'Urgência - até 24 horas' %}selected{% endif %}>Urgência - até 24 horas</option>
-                    <option value="Urgência eletiva - até 3 dias" {% if recado.prioridade == 'Urgência eletiva - até 3 dias' %}selected{% endif %}>Urgência eletiva - até 3 dias</option>
-                    <option value="Eletiva" {% if recado.prioridade == 'Eletiva' %}selected{% endif %}>Eletiva</option>
-                </select>
+            <label>Telefone:</label>
+            <input type="text" id="telefone" name="telefone" value="{{ recado['telefone'] }}" required>
 
+            <label>Convênio:</label>
+            <input type="text" name="convenio" value="{{ recado['convenio'] if recado['convenio'] else '' }}">
 
-                <label>Mensagem:</label>
-                <textarea name="mensagem" style="text-align:left; padding:10px; line-height:1.5; white-space:pre-wrap;">{{ recado['descricao'] }}</textarea>
-                <button type="submit">Salvar Alterações</button>
-                <a href="{{ url_for('responsavel.detalhar_recado', id=recado.id) }}">Cancelar</a>
-            </form>
-         </div>   
-    </div>   
+            <label>Status:</label>
+            <select name="status" required>
+                <option value="pendente" {% if recado['status'] == 'pendente' %}selected{% endif %}>Pendente</option>
+                <option value="imprimir" {% if recado['status'] == 'imprimir' %}selected{% endif %}>Imprimir</option>
+                <option value="solicitado_ao_medico" {% if recado['status'] == 'solicitado_ao_medico' %}selected{% endif %}>Solicitado ao Médico</option>
+                <option value="respondido" {% if recado['status'] == 'respondido' %}selected{% endif %}>Respondido</option>
+                <option value="passar_cartao" {% if recado['status'] == 'passar_cartao' %}selected{% endif %}>Passar Cartão</option>
+                <option value="so_entregar" {% if recado['status'] == 'so_entregar' %}selected{% endif %}>Só Entregar</option>
+                <option value="alto_custo" {% if recado['status'] == 'alto_custo' %}selected{% endif %}>Alto Custo</option>
+                <option value="entregue" {% if recado['status'] == 'entregue' %}selected{% endif %}>Entregue</option>
+            </select>
+
+            <label>Descrição do Recado:</label>
+            <textarea name="descricao" rows="4" required>{{ recado['descricao'] }}</textarea>
+
+            <button type="submit">Salvar Alterações</button>
+        </form>
+        
+        <div class="links" style="margin-top: 20px;">
+            <a href="{{ url_for('responsavel.detalhar_recado', id=recado['id']) }}">Cancelar</a>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/inputmask.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/validacao-data.js') }}"></script>
+    <script>
+        $(document).ready(function(){
+            $('#telefone').inputmask('(99) 99999-9999');
+            $('#data_nascimento').inputmask('99/99/9999');
+        });
+    </script>
 </body>
 </html>

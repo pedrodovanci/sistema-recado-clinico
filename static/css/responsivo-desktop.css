@@ -1,0 +1,370 @@
+/* ==============================================
+   RESPONSIVIDADE PARA MONITORES DE COMPUTADOR
+   ============================================== */
+
+/* Monitores Ultra Wide (2560px+) */
+@media screen and (min-width: 2560px) {
+  .container {
+    max-width: 85%;
+    padding: 40px;
+    margin: 60px auto;
+  }
+  
+  h1 {
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+  }
+  
+  h2 {
+    font-size: 2rem;
+    margin-bottom: 25px;
+  }
+  
+  .menu a,
+  .imprimir a {
+    padding: 12px 20px;
+    font-size: 1.1rem;
+    margin: 0 12px;
+  }
+  
+  .status-filtro a {
+    padding: 12px 18px;
+    font-size: 1.05rem;
+    margin: 0 8px;
+  }
+  
+  table {
+    font-size: 1.1rem;
+  }
+  
+  th, td {
+    padding: 15px 18px;
+  }
+  
+  .btn {
+    padding: 10px 16px;
+    font-size: 1rem;
+  }
+  
+  .coluna-nome,
+  .coluna-mensagem {
+    max-width: 300px;
+  }
+}
+
+/* Monitores Full HD e QHD (1920px - 2559px) */
+@media screen and (min-width: 1920px) and (max-width: 2559px) {
+  .container {
+    max-width: 90%;
+    padding: 35px;
+    margin: 50px auto;
+  }
+  
+  h1 {
+    font-size: 2.2rem;
+    margin-bottom: 25px;
+  }
+  
+  h2 {
+    font-size: 1.8rem;
+    margin-bottom: 20px;
+  }
+  
+  .menu a,
+  .imprimir a {
+    padding: 10px 16px;
+    font-size: 1.05rem;
+    margin: 0 10px;
+  }
+  
+  .status-filtro a {
+    padding: 10px 15px;
+    font-size: 1rem;
+    margin: 0 7px;
+  }
+  
+  table {
+    font-size: 1.05rem;
+  }
+  
+  th, td {
+    padding: 12px 15px;
+  }
+  
+  .btn {
+    padding: 8px 14px;
+    font-size: 0.95rem;
+  }
+  
+  .coluna-nome,
+  .coluna-mensagem {
+    max-width: 280px;
+  }
+}
+
+/* Monitores HD+ (1600px - 1919px) */
+@media screen and (min-width: 1600px) and (max-width: 1919px) {
+  .container {
+    max-width: 92%;
+    padding: 30px;
+    margin: 40px auto;
+  }
+  
+  h1 {
+    font-size: 2rem;
+    margin-bottom: 20px;
+  }
+  
+  h2 {
+    font-size: 1.6rem;
+    margin-bottom: 18px;
+  }
+  
+  .menu a,
+  .imprimir a {
+    padding: 9px 14px;
+    font-size: 1rem;
+    margin: 0 8px;
+  }
+  
+  .status-filtro a {
+    padding: 9px 13px;
+    font-size: 0.95rem;
+    margin: 0 6px;
+  }
+  
+  table {
+    font-size: 1rem;
+  }
+  
+  th, td {
+    padding: 11px 13px;
+  }
+  
+  .btn {
+    padding: 7px 12px;
+    font-size: 0.9rem;
+  }
+  
+  .coluna-nome,
+  .coluna-mensagem {
+    max-width: 250px;
+  }
+}
+
+/* Monitores HD (1366px - 1599px) */
+@media screen and (min-width: 1366px) and (max-width: 1599px) {
+  .container {
+    max-width: 95%;
+    padding: 25px;
+    margin: 30px auto;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+    margin-bottom: 18px;
+  }
+  
+  h2 {
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+  }
+  
+  .menu a,
+  .imprimir a {
+    padding: 8px 12px;
+    font-size: 0.95rem;
+    margin: 0 6px;
+  }
+  
+  .status-filtro a {
+    padding: 8px 11px;
+    font-size: 0.9rem;
+    margin: 0 5px;
+  }
+  
+  table {
+    font-size: 0.95rem;
+  }
+  
+  th, td {
+    padding: 10px 12px;
+  }
+  
+  .btn {
+    padding: 6px 10px;
+    font-size: 0.85rem;
+  }
+  
+  .coluna-nome,
+  .coluna-mensagem {
+    max-width: 220px;
+  }
+}
+
+/* Monitores menores (1024px - 1365px) */
+@media screen and (min-width: 1024px) and (max-width: 1365px) {
+  .container {
+    max-width: 98%;
+    padding: 20px;
+    margin: 20px auto;
+  }
+  
+  h1 {
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+  }
+  
+  h2 {
+    font-size: 1.4rem;
+    margin-bottom: 12px;
+  }
+  
+  .menu a,
+  .imprimir a {
+    padding: 7px 10px;
+    font-size: 0.9rem;
+    margin: 0 4px;
+  }
+  
+  .status-filtro a {
+    padding: 7px 9px;
+    font-size: 0.85rem;
+    margin: 0 3px;
+  }
+  
+  table {
+    font-size: 0.9rem;
+  }
+  
+  th, td {
+    padding: 8px 10px;
+  }
+  
+  .btn {
+    padding: 5px 8px;
+    font-size: 0.8rem;
+  }
+  
+  .coluna-nome,
+  .coluna-mensagem {
+    max-width: 180px;
+  }
+  
+  /* Ajustes específicos para telas menores */
+  .status-filtro {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 5px;
+  }
+  
+  .menu {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+}
+
+/* Ajustes gerais para todos os monitores */
+@media screen and (min-width: 1024px) {
+  /* Melhorar legibilidade em telas grandes */
+  body {
+    line-height: 1.6;
+  }
+  
+  /* Otimizar espaçamento dos formulários */
+  .campo-busca {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0;
+  }
+  
+  .campo-busca input {
+    min-width: 300px;
+    padding: 10px 15px;
+    font-size: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+  }
+  
+  .campo-busca button {
+    padding: 10px 15px;
+    font-size: 1.1rem;
+    background-color: #3b82f6;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+  }
+  
+  .campo-busca button:hover {
+    background-color: #1e40af;
+  }
+  
+  /* Melhorar visualização das tabelas */
+  .accordion {
+    font-size: 1.1rem;
+    padding: 15px 20px;
+    margin: 10px 0;
+  }
+  
+  .badge-contador {
+    font-size: 0.9rem;
+    padding: 4px 8px;
+    border-radius: 12px;
+  }
+  
+  /* Otimizar modais para desktop */
+  .modal-overlay {
+    backdrop-filter: blur(4px);
+  }
+  
+  .modal-card {
+    max-width: 600px;
+    margin: 5% auto;
+    padding: 30px;
+  }
+  
+  /* Melhorar toasts para desktop */
+  .toast-container {
+    right: 30px !important;
+    bottom: 30px !important;
+  }
+  
+  .toast {
+    min-width: 350px;
+    max-width: 450px;
+    font-size: 1rem;
+  }
+}
+
+/* Ajustes específicos para monitores ultrawide */
+@media screen and (min-width: 2560px) {
+  .container {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 30px;
+  }
+  
+  /* Melhor aproveitamento do espaço horizontal */
+  .status-filtro {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 10px;
+    max-width: 1200px;
+    margin: 20px auto;
+  }
+  
+  .menu {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+    gap: 15px;
+    max-width: 800px;
+    margin: 20px auto;
+  }
+}

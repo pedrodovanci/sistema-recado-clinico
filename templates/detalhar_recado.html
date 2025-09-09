@@ -5,6 +5,7 @@
     <title>Detalhes do Recado</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="{{ url_for('static', filename='css/detalhar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo-desktop.css') }}">
 
   </head>
   <body class="fundo">
@@ -31,13 +32,12 @@
             <p><strong>{{ recado['status'] }}</strong></p>
           </div>
           <div class="campo">
-            <label>Solicitado por:</label></strong> 
+            <label>Solicitado por:</label>
             <p><strong>{{ recado['usuario'] }}</strong></p>
-
-         </div>
+          </div>
           <div class="campo">
             <label>Prioridade:</label>
-           <p><strong>{{ recado['prioridade'] }}</strong></p>
+            <p><strong>{{ recado['prioridade'] }}</strong></p>
           </div>
 
           <div class="mensagem-container">

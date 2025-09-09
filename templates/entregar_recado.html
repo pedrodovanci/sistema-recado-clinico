@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Entregar Recado</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/listar.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo-desktop.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/emoji-buttons.css') }}">
 
   <style>
     :root { --container-alpha: .85; }
@@ -84,17 +86,79 @@
       border:1px solid rgba(0,0,0,.06); display:inline-block;
     }
     .btn-paciente:hover{ filter:brightness(.98); }
+
+    /* Botão desabilitado */
+    .btn-desabilitado {
+      background-color: #95a5a6 !important;
+      color: #fff !important;
+      cursor: not-allowed !important;
+      opacity: 0.6;
+      text-decoration: none;
+      padding: 6px 12px;
+      border-radius: 4px;
+      display: inline-block;
+      font-size: 0.9rem;
+    }
+    .btn-desabilitado:hover {
+      background-color: #95a5a6 !important;
+      opacity: 0.6;
+    }
+
+    /* Estilos para Toast (mensagens flash) */
+    .toast-container {
+      position: fixed !important;
+      right: 24px !important;
+      bottom: 24px !important;
+      left: auto !important;
+      top: auto !important;
+      transform: none !important;
+      z-index: 99999 !important;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .toast {
+      min-width: 320px;
+      max-width: 420px;
+      padding: 12px 14px;
+      border-radius: 10px;
+      background: #fff;
+      color: #0f172a;
+      box-shadow: 0 10px 24px rgba(0,0,0,.18);
+      border-left: 6px solid #3b82f6;
+      pointer-events: auto;
+      animation: toast-in .25s ease both;
+    }
+    .toast.success { border-left-color: #22c55e; }
+    .toast.danger  { border-left-color: #ef4444; }
+    .toast.warning { border-left-color: #f59e0b; }
+    .toast.info    { border-left-color: #3b82f6; }
+
+    @keyframes toast-in {
+      from { transform: translateY(8px); opacity: 0; }
+      to   { transform: translateY(0);   opacity: 1; }
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>Digite o nome do paciente para encontrar seu recado</h1>
+    <!-- Cabeçalho com título e botão voltar -->
+    <div style="display: flex; align-items: center; margin-bottom: 20px; gap: 15px;">
+      {% if perfil == 'atendente' %}
+        <a href="{{ url_for('comuns.inicio') }}" class="btn-sair">← Voltar</a>
+      {% else %}
+        <a href="{{ url_for('responsavel.listar', status=status or 'pendente') }}" class="btn-sair">← Voltar</a>
+      {% endif %}
+      <h1 style="margin: 0;">Digite o nome do paciente para encontrar seu recado</h1>
+    </div>
 
     <!-- Busca -->
     <form class="campo-busca" method="get" action="{{ url_for('comuns.entregar_recado') }}">
       <input type="hidden" name="status" value="{{ status }}">
       <input type="text" name="busca" placeholder="Ex.: Maria" value="{{ busca }}">
-      <button type="submit" title="Buscar">&#128269;</button>
+      <button type="submit" class="btn-search" title="Buscar">🔍</button>
     </form>
 
     {% if busca %}
@@ -158,8 +222,12 @@
                     <td>{{ r['data_cadastro']|format_data }}</td>
                     <td><span class="mensagem-preview">{{ r['descricao'] }}</span></td>
                     <td>
-                      <a href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='entregue') }}"
-                         class="btn btn-primario">Entregar</a>
+                      {% if r['status'] == 'entregue' %}
+                        <span class="btn btn-desabilitado" title="Recado já foi entregue">Entregue</span>
+                      {% else %}
+                        <a href="{{ url_for('comuns.atualizar_status', id=r['id'], novo_status='entregue') }}"
+                           class="btn btn-primario">Entregar</a>
+                      {% endif %}
                     </td>
                   </tr>
                 {% endfor %}
@@ -179,17 +247,23 @@
       </div>
     {% endif %}
 
-    <div class="footer-links" style="margin-top:16px;">
-      {% if perfil == 'atendente' %}
-        <a href="{{ url_for('comuns.inicio') }}" class="btn-sair">← Voltar</a>
-      {% else %}
-        <a href="{{ url_for('responsavel.listar', status=status or 'pendente') }}" class="btn-sair">← Voltar</a>
-      {% endif %}
-    </div>
+
   </div>
+
+  <!-- Mensagens Flash (Toast) -->
+  {% with mensagens = get_flashed_messages(with_categories=true) %}
+  {% if mensagens %}
+  <div class="toast-container">
+    {% for categoria, msg in mensagens %}
+    <div class="toast {{ categoria }}">✅ {{ msg.replace('_', ' ') }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+  {% endwith %}
 
   <script>
   document.addEventListener('DOMContentLoaded', () => {
+    // Funcionalidade de colapsar/expandir médicos
     document.querySelectorAll('.faixa-medico').forEach((header, i) => {
       const panel = header.nextElementSibling;
       if (!panel || !panel.classList.contains('table-colapsavel')) return;
@@ -210,6 +284,21 @@
       header.addEventListener('keydown', (e) => {
         if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggle(); }
       });
+    });
+
+    // Funcionalidade dos toasts (mensagens flash)
+    const toasts = document.querySelectorAll('.toast');
+    toasts.forEach((toast) => {
+      // fecha ao clicar
+      toast.addEventListener('click', () => toast.remove());
+
+      // some sozinho após 5s
+      setTimeout(() => {
+        toast.style.transition = 'opacity .4s ease, transform .4s ease';
+        toast.style.opacity = '0';
+        toast.style.transform = 'translateY(6px)';
+        setTimeout(() => toast.remove(), 400);
+      }, 5000);
     });
   });
   </script>

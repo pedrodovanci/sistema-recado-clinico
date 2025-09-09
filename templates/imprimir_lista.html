@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <title>Impressão de Recados</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/imprimir_lista.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/emoji-buttons.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo-desktop.css') }}">
 </head>
 <body>
     <div class="no-print botoes-topo">
-        <button onclick="window.print()" class="btn-imprimir-topo">🖨️ Imprimir todos</button>
+        <button onclick="window.print()" class="btn-imprimir-topo btn-print">🖨️ Imprimir todos</button>
         <a href="{{ url_for('responsavel.listar') }}" class="btn-voltar-topo">Voltar</a>
     </div>
 

@@ -1,0 +1,494 @@
+/* ==============================================
+   OTIMIZAÇÃO DE EMOJIS EM BOTÕES
+   ============================================== */
+
+/* Estilos base para botões com emojis */
+button,
+.btn,
+.btn-primario,
+.btn-secundario,
+.btn-imprimir-topo,
+.btn-voltar-topo {
+  /* Garantir que o conteúdo seja centralizado */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  vertical-align: middle;
+  
+  /* Permitir que emojis sejam renderizados corretamente */
+  font-variant-emoji: normal;
+  font-feature-settings: "liga" 1, "kern" 1;
+}
+
+/* Otimização específica para emojis */
+button:contains("🔍"),
+button:contains("🖨️"),
+.btn:contains("🔍"),
+.btn:contains("🖨️"),
+.btn-imprimir-topo:contains("🖨️") {
+  /* Garantir renderização adequada de emojis */
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ajustes responsivos para emojis baseados no tamanho do botão */
+
+/* Botões pequenos */
+button[style*="font-size: 12px"],
+.btn-small,
+button.small {
+  font-size: 12px;
+}
+
+button[style*="font-size: 12px"]:contains("🔍"),
+button[style*="font-size: 12px"]:contains("🖨️"),
+.btn-small:contains("🔍"),
+.btn-small:contains("🖨️"),
+button.small:contains("🔍"),
+button.small:contains("🖨️") {
+  font-size: 10px;
+  line-height: 1;
+}
+
+/* Botões médios (padrão) */
+button,
+.btn,
+.btn-primario,
+.btn-secundario {
+  font-size: 14px;
+  line-height: 1.2;
+}
+
+button:contains("🔍"),
+button:contains("🖨️"),
+.btn:contains("🔍"),
+.btn:contains("🖨️"),
+.btn-primario:contains("🔍"),
+.btn-primario:contains("🖨️"),
+.btn-secundario:contains("🔍"),
+.btn-secundario:contains("🖨️") {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* Botões grandes */
+button[style*="font-size: 18px"],
+.btn-large,
+button.large,
+.btn-imprimir-topo {
+  font-size: 18px;
+}
+
+button[style*="font-size: 18px"]:contains("🔍"),
+button[style*="font-size: 18px"]:contains("🖨️"),
+.btn-large:contains("🔍"),
+.btn-large:contains("🖨️"),
+button.large:contains("🔍"),
+button.large:contains("🖨️"),
+.btn-imprimir-topo:contains("🖨️") {
+  font-size: 20px;
+  line-height: 1;
+}
+
+/* Ajustes específicos para diferentes resoluções de monitor */
+
+/* Monitores Ultra Wide (2560px+) */
+@media screen and (min-width: 2560px) {
+  button,
+  .btn,
+  .btn-primario,
+  .btn-secundario {
+    font-size: 16px;
+    padding: 12px 20px;
+  }
+  
+  button:contains("🔍"),
+  button:contains("🖨️"),
+  .btn:contains("🔍"),
+  .btn:contains("🖨️") {
+    font-size: 18px;
+  }
+  
+  .btn-imprimir-topo {
+    font-size: 20px;
+    padding: 15px 25px;
+  }
+  
+  .btn-imprimir-topo:contains("🖨️") {
+    font-size: 22px;
+  }
+}
+
+/* Monitores Full HD e QHD (1920px - 2559px) */
+@media screen and (min-width: 1920px) and (max-width: 2559px) {
+  button,
+  .btn,
+  .btn-primario,
+  .btn-secundario {
+    font-size: 15px;
+    padding: 11px 18px;
+  }
+  
+  button:contains("🔍"),
+  button:contains("🖨️"),
+  .btn:contains("🔍"),
+  .btn:contains("🖨️") {
+    font-size: 17px;
+  }
+  
+  .btn-imprimir-topo {
+    font-size: 18px;
+    padding: 14px 22px;
+  }
+  
+  .btn-imprimir-topo:contains("🖨️") {
+    font-size: 20px;
+  }
+}
+
+/* Monitores HD+ (1600px - 1919px) */
+@media screen and (min-width: 1600px) and (max-width: 1919px) {
+  button,
+  .btn,
+  .btn-primario,
+  .btn-secundario {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+  
+  button:contains("🔍"),
+  button:contains("🖨️"),
+  .btn:contains("🔍"),
+  .btn:contains("🖨️") {
+    font-size: 16px;
+  }
+  
+  .btn-imprimir-topo {
+    font-size: 16px;
+    padding: 12px 20px;
+  }
+  
+  .btn-imprimir-topo:contains("🖨️") {
+    font-size: 18px;
+  }
+}
+
+/* Monitores HD (1366px - 1599px) */
+@media screen and (min-width: 1366px) and (max-width: 1599px) {
+  button,
+  .btn,
+  .btn-primario,
+  .btn-secundario {
+    font-size: 13px;
+    padding: 9px 14px;
+  }
+  
+  button:contains("🔍"),
+  button:contains("🖨️"),
+  .btn:contains("🔍"),
+  .btn:contains("🖨️") {
+    font-size: 15px;
+  }
+  
+  .btn-imprimir-topo {
+    font-size: 15px;
+    padding: 11px 18px;
+  }
+  
+  .btn-imprimir-topo:contains("🖨️") {
+    font-size: 17px;
+  }
+}
+
+/* Monitores menores (1024px - 1365px) */
+@media screen and (min-width: 1024px) and (max-width: 1365px) {
+  button,
+  .btn,
+  .btn-primario,
+  .btn-secundario {
+    font-size: 12px;
+    padding: 8px 12px;
+  }
+  
+  button:contains("🔍"),
+  button:contains("🖨️"),
+  .btn:contains("🔍"),
+  .btn:contains("🖨️") {
+    font-size: 14px;
+  }
+  
+  .btn-imprimir-topo {
+    font-size: 14px;
+    padding: 10px 16px;
+  }
+  
+  .btn-imprimir-topo:contains("🖨️") {
+    font-size: 16px;
+  }
+}
+
+/* Ajustes específicos para o botão de busca */
+button[type="submit"]:contains("🔍") {
+  /* Garantir que o emoji de lupa seja bem visível */
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  
+  /* Centralização perfeita */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+button[type="submit"]:contains("🔍"):hover {
+  background: #1e40af;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+/* Ajustes específicos para botões com texto e emoji */
+.btn-imprimir-topo {
+  /* Espaçamento entre emoji e texto */
+  gap: 8px;
+  
+  /* Garantir alinhamento */
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Melhorias gerais para todos os botões com emojis */
+button:contains("🔍"),
+button:contains("🖨️"),
+.btn:contains("🔍"),
+.btn:contains("🖨️"),
+.btn-imprimir-topo:contains("🖨️") {
+  /* Garantir que emojis não sejam selecionáveis */
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  
+  /* Melhorar renderização */
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  
+  /* Garantir que não haja quebra de linha */
+  white-space: nowrap;
+  
+  /* Melhorar acessibilidade */
+  outline: none;
+}
+
+/* Estados de foco para acessibilidade */
+button:contains("🔍"):focus,
+button:contains("🖨️"):focus,
+.btn:contains("🔍"):focus,
+.btn:contains("🖨️"):focus,
+.btn-imprimir-topo:contains("🖨️"):focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Animações suaves para interações */
+button:contains("🔍"),
+button:contains("🖨️"),
+.btn:contains("🔍"),
+.btn:contains("🖨️"),
+.btn-imprimir-topo:contains("🖨️") {
+  transition: all 0.2s ease-in-out;
+}
+
+button:contains("🔍"):active,
+button:contains("🖨️"):active,
+.btn:contains("🔍"):active,
+.btn:contains("🖨️"):active,
+.btn-imprimir-topo:contains("🖨️"):active {
+  transform: scale(0.98);
+}
+
+/* Classes específicas para botões com emojis - Compatibilidade total */
+.btn-search,
+.btn-print {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-font-feature-settings: "liga";
+  font-feature-settings: "liga";
+  white-space: nowrap;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+  transition: all 0.2s ease-in-out;
+}
+
+/* Botão de busca com emoji 🔍 */
+.btn-search {
+  min-width: 40px;
+  min-height: 40px;
+  border-radius: 50%;
+  background: #3b82f6;
+  color: white;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+}
+
+.btn-search:hover {
+  background: #1e40af;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(59, 130, 246, 0.3);
+}
+
+.btn-search:active {
+  transform: scale(0.98);
+}
+
+.btn-search:focus {
+  outline: 2px solid #3b82f6;
+  outline-offset: 2px;
+}
+
+/* Botão de impressão com emoji 🖨️ */
+.btn-print {
+  gap: 8px;
+  padding: 10px 18px;
+  font-size: 14px;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  line-height: 1.2;
+}
+
+.btn-print:hover {
+  background-color: #1a252f;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(44, 62, 80, 0.3);
+}
+
+.btn-print:active {
+  transform: scale(0.98);
+}
+
+.btn-print:focus {
+  outline: 2px solid #2c3e50;
+  outline-offset: 2px;
+}
+
+/* Ajustes responsivos para as classes específicas */
+
+/* Monitores Ultra Wide (2560px+) */
+@media screen and (min-width: 2560px) {
+  .btn-search {
+    min-width: 50px;
+    min-height: 50px;
+    font-size: 20px;
+  }
+  
+  .btn-print {
+    font-size: 18px;
+    padding: 15px 25px;
+    gap: 10px;
+  }
+}
+
+/* Monitores Full HD e QHD (1920px - 2559px) */
+@media screen and (min-width: 1920px) and (max-width: 2559px) {
+  .btn-search {
+    min-width: 45px;
+    min-height: 45px;
+    font-size: 18px;
+  }
+  
+  .btn-print {
+    font-size: 16px;
+    padding: 14px 22px;
+    gap: 9px;
+  }
+}
+
+/* Monitores HD+ (1600px - 1919px) */
+@media screen and (min-width: 1600px) and (max-width: 1919px) {
+  .btn-search {
+    min-width: 42px;
+    min-height: 42px;
+    font-size: 17px;
+  }
+  
+  .btn-print {
+    font-size: 15px;
+    padding: 12px 20px;
+    gap: 8px;
+  }
+}
+
+/* Monitores HD (1366px - 1599px) */
+@media screen and (min-width: 1366px) and (max-width: 1599px) {
+  .btn-search {
+    min-width: 40px;
+    min-height: 40px;
+    font-size: 16px;
+  }
+  
+  .btn-print {
+    font-size: 14px;
+    padding: 11px 18px;
+    gap: 8px;
+  }
+}
+
+/* Monitores menores (1024px - 1365px) */
+@media screen and (min-width: 1024px) and (max-width: 1365px) {
+  .btn-search {
+    min-width: 38px;
+    min-height: 38px;
+    font-size: 15px;
+  }
+  
+  .btn-print {
+    font-size: 13px;
+    padding: 10px 16px;
+    gap: 7px;
+  }
+}
+
+/* Garantir que emojis sejam sempre centralizados */
+.btn-search::before,
+.btn-print::before {
+  content: '';
+  display: inline-block;
+  width: 0;
+  height: 100%;
+  vertical-align: middle;
+}
+
+/* Melhorar compatibilidade com diferentes sistemas operacionais */
+@supports (-webkit-appearance: none) {
+  .btn-search,
+  .btn-print {
+    -webkit-appearance: none;
+  }
+}
+
+@supports (-moz-appearance: none) {
+  .btn-search,
+  .btn-print {
+    -moz-appearance: none;
+  }
+}

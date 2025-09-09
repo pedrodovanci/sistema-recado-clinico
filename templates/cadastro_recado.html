@@ -5,6 +5,8 @@
     <title>Cadastro de Recado</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="{{ url_for('static', filename='css/cadastro.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/responsivo-desktop.css') }}">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/formularios-responsivo.css') }}">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"></script>
 </head>
@@ -58,7 +60,7 @@
             <input type="text" name="nome_paciente" required>
 
             <label>Data de Nascimento:</label>
-            <input type="date" name="data_nascimento" required>
+            <input type="text" id="data_nascimento" name="data_nascimento" placeholder="dd/mm/aaaa" required>
 
             <label>Telefone:</label>
             <input type="text" id="telefone" name="telefone" required>
@@ -73,9 +75,12 @@
         </form>
     </div>
 
+    <script src="{{ url_for('static', filename='js/inputmask.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/validacao-data.js') }}"></script>
     <script>
         $(document).ready(function(){
             $('#telefone').inputmask('(99) 99999-9999');
+            $('#data_nascimento').inputmask('99/99/9999');
         });
     </script>
 </body>
